@@ -1,26 +1,55 @@
-#include <iostream>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <string.h>
+#ifndef SERVER_HPP
+#define SERVER_HPP
 
-class server{
-    private:
-        int _server_fd;
-        int _client_fd;
-        int _port;
-        struct sockaddr_in serveraddr;
-        struct sockaddr_in clientaddr;
-        bool _is_running;
-    public:
-        server();
-        // server(int port);
-        // server(const server& other);
-        // server& operator=(const server& other);
-        void createsocket();
-        void bindsocket();
-        void listensocket();
-        void acceptsocket();
-        void runServer();
-};
+# include <iostream>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <string>
+#include <fcntl.h>
+#include <sys/epoll.h>
+#include <cstdlib>
+#include <cstdio>
+#include <map>
+#include <algorithm>
+#include <fstream>
+#include "client.hpp"
+class client;
+#include "client.hpp" // Ensure the full definition of client is included
+
+class Server {
+public:
+    Server(int port);
+    ~Server();
+    void run();
+
+private:
+    int _serverFd;
+    int _port;
+    int epollFd;
+    std::string _password;
+    std::string _ip;
+    struct sockaddr_in _serverAddr;
+    std::map<int, client> _clients; // Map of client file descriptors to client objects
+    Server();
+    Server(char **av);
+    Server(const Server &other);
+    Server &operator=(const Server &other);
+
+    void createSocket();
+    void setSocketReused();
+    void bindSocket();
+    void listenSocket();
+    static int makeSocketNonBlocking(int sFd);
+    void closeSocket(int socketFd);
+    void creatEpoll();
+    void addEpoll(int fd);
+    void acceptClient();
+    void readSocket();
+    void setup();
+};;
+
+#endif
