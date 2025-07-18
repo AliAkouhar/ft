@@ -1,5 +1,5 @@
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#ifndef OLD_SERVER_HPP
+#define OLD_SERVER_HPP
 
 # include <iostream>
 #include <sys/types.h>
