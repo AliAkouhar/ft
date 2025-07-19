@@ -27,7 +27,6 @@ Server::Server(std::string password, std::vector<Client*> clients,
 	this->_channels = channels;
 }
 
-
 Server::~Server()
 {
 	for (std::vector<Client*>::iterator it = _clients.begin();
@@ -333,37 +332,37 @@ std::string Server::_cleanse_buffer(const std::string& buffer,
 // 	}
 // }
 
-// void Server::_remove_client_fd(const int fd)
-// {
-// 	for (size_t i = 0; i < _fds.size(); i++)
-// 	{
-// 		if (_fds[i].fd == fd)
-// 		{
-// 			_fds.erase(_fds.begin() + i);
-// 			break;
-// 		}
-// 	}
-// 	close(fd);
-// }
+void Server::_remove_client_fd(const int fd)
+{
+	for (size_t i = 0; i < _fds.size(); i++)
+	{
+		if (_fds[i].fd == fd)
+		{
+			_fds.erase(_fds.begin() + i);
+			break;
+		}
+	}
+	close(fd);
+}
 
-// void Server::_remove_client_from_channels(const int fd)
-// {
-// 	Client* client = _get_client(fd);
+void Server::_remove_client_from_channels(const int fd)
+{
+	Client* client = _get_client(fd);
 
-// 	for (std::vector<Channel*>::iterator it = _channels.begin();
-// 		 it != _channels.end();
-// 		 ++it)
-// 	{
-// 		(*it)->remove_channel_client(client);
-// 	}
-// }
+	for (std::vector<Channel*>::iterator it = _channels.begin();
+		 it != _channels.end();
+		 ++it)
+	{
+		(*it)->remove_channel_client(client);
+	}
+}
 
-// void Server::_clear_client(const int fd)
-// {
-// 	_remove_client_from_channels(fd);
-// 	_remove_client_from_server(fd);
-// 	_remove_client_fd(fd);
-// }
+void Server::_clear_client(const int fd)
+{
+	_remove_client_from_channels(fd);
+	_remove_client_from_server(fd);
+	_remove_client_fd(fd);
+}
 
 /*
 ** ----------------------------- SIGNAL FUCTIONS ------------------------------

@@ -156,7 +156,8 @@ void Server::readSocket()
                     }
                     else
                     {
-                        if ()
+                        // if ()
+                        std::cout << "buffer : " << buffer << std::endl;
                     }
                 }
             }

@@ -16,16 +16,16 @@ std::vector<std::string> _split_string(const std::string& s, char delimiter) { /
 
 void Server::_handler_client_part(const std::string& buffer, const int fd)
 {
-    std::vector<std::string> param = _split_buffer(buffer, SPACE);
-    std::string nickname = client->get_nickname();
 	Client* client = _get_client(fd);
+    std::string nickname = client->get_nickname();
+    std::vector<std::string> param = _split_buffer(buffer, SPACE);
 
     if (buffer.empty())
     {
-        _send_response(fd, ERR_NEEDMODEPARM(nickname));
+        _send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
         _reply_code = 461;
     }
-    else if (!client->get_is_logged)
+    else if (!client->get_is_logged())
     {
         _send_response(fd, ERR_USERNOTINCHANNEL(nickname, param[0]));
         _reply_code = 451;
