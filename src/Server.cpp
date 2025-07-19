@@ -27,7 +27,6 @@ Server::Server(std::string password, std::vector<Client*> clients,
 	this->_channels = channels;
 }
 
-
 Server::~Server()
 {
 	for (std::vector<Client*>::iterator it = _clients.begin();
@@ -144,20 +143,6 @@ std::vector<std::string> _split_string(const std::string& s, char delimiter) {
     return tokens;
 }
 
-// const Server::command_handler Server::_command_list[_command_list_size] = {
-// 	{"JOIN", &Server::_handler_client_join},
-// 	{"QUIT", &Server::_handler_client_quit},
-// 	{"PART", &Server::_handler_client_part},
-// 	{"MODE", &Server::_handler_client_mode},
-// 	{"KICK", &Server::_handler_client_kick},
-// 	{"TOPIC", &Server::_handler_client_topic},
-// 	{"NICK", &Server::_handler_client_nickname},
-// 	{"USER", &Server::_handler_client_username},
-// 	{"PASS", &Server::_handler_client_password},
-// 	{"INVITE", &Server::_handler_client_invite},
-// 	{"PRIVMSG", &Server::_handler_client_privmsg}
-// };
-
 std::map<std::string, void (Server::*)(const std::string &, int)> 
 
 command_map = {
@@ -184,32 +169,20 @@ void Server::_execute_command(const std::string buffer, const int fd)
 	std::string clean_buffer = _cleanse_buffer(buffer, CRLF);
 	std::vector<std::string> splitted_buffer =
 		_split_commd(clean_buffer, DELIMITER);
+
 	if (splitted_buffer.empty())
-		return;
+		return ;
+
 	std::string command = toupper(splitted_buffer[0]);
 	std::string parameters = splitted_buffer[1];
- 
-	// for (size_t i = 0; i < _command_list_size; i++)
-	// {
-		if (command == "WHO")
-		{
-			cmd_executed = true;
-			// break;
-		}
-		else if (command_map.count(command))
-		{
-			(this->*command_map[command])(parameters, fd);
-			cmd_executed = true;
-			// break;
-		}
-
-		// if (command == _command_list[i].command)
-		// {
-		// 	(this->*_command_list[i].handler)(parameters, fd);
-		// 	cmd_executed = true;
-		// 	break;
-		// }
-	// }
+	
+	if (command == "WHO")
+		cmd_executed = true;
+	else if (command_map.count(command))
+	{
+		(this->*command_map[command])(parameters, fd);
+		cmd_executed = true;
+	}
 	if (!cmd_executed)
 		_send_response(fd, ERR_CMDNOTFOUND(command));
 }
