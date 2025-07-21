@@ -157,6 +157,7 @@ void Server::readSocket()
                     else
                     {
                         // if ()
+                        // buffer + '\0'; + fd of the client that triger the event
                         std::cout << "buffer : " << buffer << std::endl;
                     }
                 }

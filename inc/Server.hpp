@@ -53,10 +53,13 @@ class Server
 	int _port;
 	int _server_fdsocket;
 	std::string _hostname;
-	std::string _password;
-	std::vector<Client*> _clients;
 	std::vector<struct pollfd> _fds;
 	struct sockaddr_in _server_addr;
+
+	//my variables , dont tuch them
+
+	std::string _password;
+	std::vector<Client*> _clients;
 	std::vector<Channel*> _channels;
 
 	int _reply_code;
@@ -79,19 +82,18 @@ class Server
 	void _handler_client_nickname(const std::string& nickname, const int fd);
 	void _handler_client_username(const std::string& username, const int fd);
 	void _handler_client_password(const std::string& password, const int fd);
-
+	void _send_response(const int fd, const std::string& response);
 
 	static bool _signal;
 	static void _signal_handler(const int signum);
 
-	void _close_fds();
-	void _server_loop();
-	void _set_server_socket();
-	void _add_server_signal();
-	void _accept_new_client();
-	void _clear_client(const int fd);
-	void _receive_new_data(const int fd);
-	void _send_response(const int fd, const std::string& response);
+	// void _close_fds();
+	// void _server_loop();
+	// void _set_server_socket();
+	// void _add_server_signal();
+	// void _accept_new_client();
+	// void _clear_client(const int fd);
+	// void _receive_new_data(const int fd);
 
 	// struct command_handler
 	// {
