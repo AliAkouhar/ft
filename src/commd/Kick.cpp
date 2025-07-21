@@ -1,19 +1,19 @@
+#include "../../inc/Server.hpp"
 
-void Server::_handler_client_kick(const std::string& buffer, const int fd)
-{
-	Client* client = _get_client(fd);
+/* KICK <channel> <user> [:<comment>] */
 
-	if (!client->get_is_logged())
-	{
-		_send_response(fd, ERR_NOTREGISTERED(client->get_nickname()));
+void Server::_handler_client_kick(const std::string& buffer, const int fd) {
+	Client* kicker = _get_client(fd);
+
+	if (!kicker->get_is_logged()) {
+		_send_response(fd, ERR_NOTREGISTERED(kicker->get_nickname()));
 		_reply_code = 451;
 		return;
 	}
 
 	std::vector<std::string> params = _split_buffer(buffer, SPACE);
-	if (params.size() < 2)
-	{
-		_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
+	if (params.size() < 2) {
+		_send_response(fd, ERR_NEEDMOREPARAMS(kicker->get_nickname()));
 		_reply_code = 461;
 		return;
 	}
@@ -23,61 +23,50 @@ void Server::_handler_client_kick(const std::string& buffer, const int fd)
 	std::string target_nickname = comments[0];
 
 	Channel* channel = _get_channel(channel_name);
-	if (!channel)
-	{
+	if (!channel) {
 		_send_response(fd, ERR_NOSUCHCHANNEL(channel_name));
 		_reply_code = 403;
 		return;
 	}
 
-	if (!channel->has_client(client))
-	{
+	if (!channel->has_client(kicker)) {
 		_send_response(fd, ERR_NOTONCHANNEL(channel_name));
 		_reply_code = 442;
 		return;
 	}
 
-	if (!channel->is_channel_operator(client->get_nickname()))
-	{
+	if (!channel->is_channel_operator(kicker->get_nickname())) {
 		_send_response(fd, ERR_CHANOPRIVSNEEDED(channel_name));
 		_reply_code = 482;
 		return;
 	}
 
-	Client* target_client = _get_client(target_nickname);
-	if (!target_client)
-	{
-		_send_response(fd, ERR_NOSUCHNICK(channel_name, target_nickname));
-		_reply_code = 401;
-		return;
-	}
-
-	if (!channel->has_client(target_client))
-	{
+	Client* target = _get_client(target_nickname);
+	if (!target || !channel->has_client(target)) {
 		_send_response(fd, ERR_USERNOTINCHANNEL(target_nickname, channel_name));
 		_reply_code = 441;
 		return;
 	}
 
+	
 	if (params.size() > 2)
 	{
 		_send_response(fd,
-					   RPL_KICK(client->get_hostname(),
+					   RPL_KICK(kicker->get_hostname(),
 								channel_name,
-								client->get_nickname(),
-								target_client->get_nickname(),
+								kicker->get_nickname(),
+								target->get_nickname(),
 								comments[1]));
 	}
 	else
 	{
 		_send_response(fd,
-					   RPL_KICK(client->get_hostname(),
+					   RPL_KICK(kicker->get_hostname(),
 								channel_name,
-								client->get_nickname(),
-								target_client->get_nickname(),
+								kicker->get_nickname(),
+								target->get_nickname(),
 								""));
 	}
-
-	channel->kick(target_client);
+	channel->kick(target);
 	_reply_code = 200;
 }
