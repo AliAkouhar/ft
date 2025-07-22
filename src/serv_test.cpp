@@ -316,21 +316,21 @@ std::string Server::_cleanse_buffer(const std::string& buffer,
 // 	}
 // }
 
-// void Server::_remove_client_from_server(const int fd)
-// {
-// 	for (std::vector<Client*>::iterator it = _clients.begin();
-// 		 it != _clients.end();
-// 		 ++it)
-// 	{
-// 		if ((*it)->get_fd() == fd)
-// 		{
-// 			delete *it;
-// 			*it = NULL;
-// 			it = _clients.erase(it);
-// 			break;
-// 		}
-// 	}
-// }
+void Server::_remove_client_from_server(const int fd)
+{
+	for (std::vector<Client*>::iterator it = _clients.begin();
+		 it != _clients.end();
+		 ++it)
+	{
+		if ((*it)->get_fd() == fd)
+		{
+			delete *it;
+			*it = NULL;
+			it = _clients.erase(it);
+			break;
+		}
+	}
+}
 
 void Server::_remove_client_fd(const int fd)
 {

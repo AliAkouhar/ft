@@ -1,5 +1,11 @@
 #include "../../inc/Server.hpp"
 
+/*
+ * Command: TOPIC
+ * Parameters: <channel> [<topic>]
+ * Reference: https://datatracker.ietf.org/doc/html/rfc1459#section-4.2.4
+ */
+
 void Server::_handler_client_topic(const std::string& buffer, const int fd) {
 	Client* client = _get_client(fd);
 	std::vector<std::string> params = _split_buffer(buffer, SPACE);
@@ -25,13 +31,12 @@ void Server::_handler_client_topic(const std::string& buffer, const int fd) {
 		return;
 	}
 
-	if (!channel->has_client(client)) {
+	if (!channel->is_client_in_channel(client->get_nickname())) {
 		_send_response(fd, ERR_NOTONCHANNEL(channel_name));
 		_reply_code = 442;
 		return;
 	}
 
-	// Show topic
 	if (params.size() == 1) {
 		std::string topic = channel->get_topic();
 		if (topic.empty()) {
@@ -41,20 +46,16 @@ void Server::_handler_client_topic(const std::string& buffer, const int fd) {
 		}
 		_reply_code = 331;
 	}
-	// Set topic
 	else {
-		// Optional: Check if only ops can set the topic
-		if (channel->is_topic_protected() && !channel->is_operator(client)) {
-			_send_response(fd, ERR_CHANOPRIVSNEEDED(client->get_nickname(), channel_name));
+		if (channel->get_topic_restriction() && !channel->is_channel_operator(client->get_nickname())) {
+			_send_response(fd, ERR_CHANOPRIVSNEEDED(channel_name));
 			_reply_code = 482;
 			return;
 		}
 
 		std::string new_topic = buffer.substr(buffer.find(params[1]));
 		channel->set_topic(new_topic);
-		_send_response_to_channel(
-			channel,
-			RPL_TOPIC(client->get_nickname(), channel_name, new_topic));
-		_reply_code = 200;
+		_send_response(fd, RPL_TOPIC(client->get_nickname(), channel_name, new_topic));
+			_reply_code = 332;
 	}
 }

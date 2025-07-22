@@ -92,7 +92,7 @@ class Server
 	// void _set_server_socket();
 	// void _add_server_signal();
 	// void _accept_new_client();
-	// void _clear_client(const int fd);
+	void _clear_client(const int fd);
 	// void _receive_new_data(const int fd);
 
 	// struct command_handler

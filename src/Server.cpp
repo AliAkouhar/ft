@@ -46,6 +46,55 @@ Server::~Server()
 	_channels.clear();
 }
 
+
+void Server::_remove_client_from_server(const int fd)
+{
+	for (std::vector<Client*>::iterator it = _clients.begin();
+		 it != _clients.end();
+		 ++it)
+	{
+		if ((*it)->get_fd() == fd)
+		{
+			delete *it;
+			*it = NULL;
+			it = _clients.erase(it);
+			break;
+		}
+	}
+}
+
+void Server::_remove_client_fd(const int fd)
+{
+	for (size_t i = 0; i < _fds.size(); i++)
+	{
+		if (_fds[i].fd == fd)
+		{
+			_fds.erase(_fds.begin() + i);
+			break;
+		}
+	}
+	close(fd);
+}
+
+void Server::_remove_client_from_channels(const int fd)
+{
+	Client* client = _get_client(fd);
+
+	for (std::vector<Channel*>::iterator it = _channels.begin();
+		 it != _channels.end();
+		 ++it)
+	{
+		(*it)->remove_channel_client(client);
+	}
+}
+
+void Server::_clear_client(const int fd)
+{
+	_remove_client_from_channels(fd);
+	_remove_client_from_server(fd);
+	_remove_client_fd(fd);
+}
+
 std::string Server::_get_hostname() { return _hostname; }
 
 Client* Server::_get_client(const int fd)
