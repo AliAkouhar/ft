@@ -42,12 +42,8 @@ class Server
   public:
 	Server();
 	~Server();
-
-	// This contructor is to be used as a workaround for mockup tests
 	Server(std::string password, std::vector<Client*> _clients,
 		   std::vector<Channel*> _channels);
-
-	void init(const std::string& port, const std::string& password);
 
   private:
 	int _port;
@@ -85,24 +81,7 @@ class Server
 	void _send_response(const int fd, const std::string& response);
 
 	static bool _signal;
-	static void _signal_handler(const int signum);
-
-	// void _close_fds();
-	// void _server_loop();
-	// void _set_server_socket();
-	// void _add_server_signal();
-	// void _accept_new_client();
 	void _clear_client(const int fd);
-	// void _receive_new_data(const int fd);
-
-	// struct command_handler
-	// {
-	// 	std::string command;
-	// 	void (Server::*handler)(const std::string&, const int);
-	// };
-	// static const command_handler _command_list[_command_list_size];
-
-	static const int _command_list_size = 16;
 
 	void _execute_command(const std::string buffer, const int fd);
 

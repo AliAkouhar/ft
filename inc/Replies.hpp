@@ -149,4 +149,4 @@
 #define ERR_CMDNOTFOUND(command) \
 	(":421 " + command + " :Unknown command" + CRLF)
 
-#endif	// REPLIES_HPP
+#endif

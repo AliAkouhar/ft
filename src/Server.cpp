@@ -4,11 +4,11 @@ Server::Server()
 {
 	_hostname = "ft_irc.ma";
 	_reply_code = 0;
-	_port = 0;
+	_port = 1337;
 	_server_fdsocket = -1;
 	_password = "";
 	memset(&_server_addr, 0, sizeof(_server_addr));
-	_fds = std::vector<struct pollfd>();
+	// _fds = std::vector<struct pollfd>();
 	_clients = std::vector<Client*>();
 	_channels = std::vector<Channel*>();
 }
@@ -18,11 +18,11 @@ Server::Server(std::string password, std::vector<Client*> clients,
 {
 	_hostname = "ft_irc.ma";
 	_reply_code = 0;
-	_port = 0;
+	_port = 1337;
 	_server_fdsocket = -1;
 	_password = password;
 	memset(&_server_addr, 0, sizeof(_server_addr));
-	_fds = std::vector<struct pollfd>();
+	// _fds = std::vector<struct pollfd>();
 	this->_clients = clients;
 	this->_channels = channels;
 }
@@ -225,9 +225,7 @@ void Server::_execute_command(const std::string buffer, const int fd)
 	std::string command = toupper(splitted_buffer[0]);
 	std::string parameters = splitted_buffer[1];
 	
-	if (command == "WHO")
-		cmd_executed = true;
-	else if (command_map.count(command))
+	if (command_map.count(command))
 	{
 		(this->*command_map[command])(parameters, fd);
 		cmd_executed = true;
