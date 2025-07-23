@@ -170,9 +170,7 @@ void Server::readSocket()
 void Server::closeSocket(int socketFd)
 {
     if (socketFd >= 0)
-    {
         close(socketFd);
-    }
 }
 {
     close(_serverFd);
