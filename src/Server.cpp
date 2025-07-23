@@ -3,6 +3,7 @@
 
 #define MAX_EVENTS 20
 #define MAX_BUFFER_SIZE 4096
+
 // Server::Server()
 // {
 // 	_hostname = "ft_irc.ma";
