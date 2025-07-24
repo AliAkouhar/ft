@@ -1,4 +1,7 @@
 #include "../../inc/Server.hpp"
+#include "../../inc/Channel.hpp"
+#include "../../inc/Client.hpp"
+#include "../../inc/Replies.hpp"
 
 void Server::_handler_client_nickname(const std::string& buffer, const int fd)
 {

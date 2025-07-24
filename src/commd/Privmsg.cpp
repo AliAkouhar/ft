@@ -1,4 +1,7 @@
 #include "../../inc/Server.hpp"
+#include "../../inc/Channel.hpp"
+#include "../../inc/Client.hpp"
+#include "../../inc/Replies.hpp"
 
 std::vector<std::string> split_parameters(const std::string& s, const std::string& delimiter) {
 	std::vector<std::string> tokens;

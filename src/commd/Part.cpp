@@ -1,4 +1,7 @@
-#include "Server.hpp"
+#include "../../inc/Server.hpp"
+#include "../../inc/Channel.hpp"
+#include "../../inc/Client.hpp"
+#include "../../inc/Replies.hpp"
 
 std::vector<std::string> _split_string(const std::string& s, char delimiter) { // add this function to  a shared file
     std::vector<std::string> tokens;

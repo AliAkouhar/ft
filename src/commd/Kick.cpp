@@ -1,4 +1,7 @@
 #include "../../inc/Server.hpp"
+#include "../../inc/Channel.hpp"
+#include "../../inc/Client.hpp"
+#include "../../inc/Replies.hpp"
 
 /* KICK <channel> <user> [:<comment>] */
 

@@ -1,4 +1,7 @@
 #include "../../inc/Server.hpp"
+#include "../../inc/Channel.hpp"
+#include "../../inc/Client.hpp"
+#include "../../inc/Replies.hpp"
 
 void Server::_handler_client_invite(const std::string& buffer, const int fd) {
 	Client* inviter = _get_client(fd);

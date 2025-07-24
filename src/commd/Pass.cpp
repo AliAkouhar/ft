@@ -1,4 +1,7 @@
 #include "../../inc/Server.hpp"
+#include "../../inc/Channel.hpp"
+#include "../../inc/Client.hpp"
+#include "../../inc/Replies.hpp"
 
 void Server::_handler_client_password(const std::string& buffer, const int fd)
 {
@@ -14,7 +17,7 @@ void Server::_handler_client_password(const std::string& buffer, const int fd)
         _send_response(fd, ERR_ALREADYREGISTERED(client->get_nickname()));
 		_reply_code = 462;
     }
-    else if (_password != buffer)
+    else if (_pass != buffer)
 	{
 		_send_response(fd, ERR_INCORPASS(std::string("*")));
 		_reply_code = 464;

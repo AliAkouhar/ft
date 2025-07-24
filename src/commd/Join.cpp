@@ -1,4 +1,7 @@
 #include "../../inc/Server.hpp"
+#include "../../inc/Channel.hpp"
+#include "../../inc/Client.hpp"
+#include "../../inc/Replies.hpp"
 
 void Server::_handler_client_join(const std::string& buffer, const int fd) {
 	std::vector<std::string> params = _split_buffer(buffer, SPACE);

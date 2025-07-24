@@ -45,8 +45,7 @@ class Server
 	~Server();
 	Server(char **ac);
 
-	// SERVER METHODS
-	 void createSocket();
+	void createSocket();
     void setSocketReused();
     void bindSocket();
     void listenSocket();
@@ -65,57 +64,53 @@ class Server
 	std::string _ip;
 	// std::vector<struct pollfd> _fds;
 	struct sockaddr_in _server_addr;
+	std::vector<Client*> _clients;
+	std::vector<Channel*> _channels;
 
-
-	//my variables , dont tuch them
-
-	// std::string _password;
-	// std::vector<Client*> _clients;
-	// std::vector<Channel*> _channels;
-
-	// int _reply_code;
+	int _reply_code;
 
 	std::string _get_hostname();
+
 	// void _is_valid_port(const std::string& port);
 	// bool _is_client_in_any_channel(const int fd);
-	// bool _client_is_ready_to_login(const int fd);
-	// bool _is_valid_nickname(const std::string& nickname);
-	// bool _is_nickname_in_use(const int fd, const std::string& nickname);
-
-	// void _handler_client_join(const std::string& buffer, const int fd);
-	// void _handler_client_quit(const std::string& buffer, const int fd);
-	// void _handler_client_part(const std::string& buffer, const int fd);
-	// void _handler_client_mode(const std::string& buffer, const int fd);
-	// void _handler_client_kick(const std::string& buffer, const int fd);
-	// void _handler_client_topic(const std::string& buffer, const int fd);
-	// void _handler_client_invite(const std::string& buffer, const int fd);
-	// void _handler_client_privmsg(const std::string& buffer, const int fd);
-	// void _handler_client_nickname(const std::string& nickname, const int fd);
-	// void _handler_client_username(const std::string& username, const int fd);
-	// void _handler_client_password(const std::string& password, const int fd);
-	// void _send_response(const int fd, const std::string& response);
+	bool _client_is_ready_to_login(const int fd);
+	bool _is_valid_nickname(const std::string& nickname);
+	bool _is_nickname_in_use(const int fd, const std::string& nickname);
+	void _handle_command(const std::string& command, const std::string& parameters, const int fd);
+	void _handler_client_join(const std::string& buffer, const int fd);
+	void _handler_client_quit(const std::string& buffer, const int fd);
+	void _handler_client_part(const std::string& buffer, const int fd);
+	void _handler_client_mode(const std::string& buffer, const int fd);
+	void _handler_client_kick(const std::string& buffer, const int fd);
+	void _handler_client_topic(const std::string& buffer, const int fd);
+	void _handler_client_invite(const std::string& buffer, const int fd);
+	void _handler_client_privmsg(const std::string& buffer, const int fd);
+	void _handler_client_nickname(const std::string& nickname, const int fd);
+	void _handler_client_username(const std::string& username, const int fd);
+	void _handler_client_password(const std::string& password, const int fd);
+	void _send_response(const int fd, const std::string& response);
 
 	// static bool _signal;
 	// void _clear_client(const int fd);
 
-	// void _execute_command(const std::string buffer, const int fd);
+	void _execute_command(const std::string buffer, const int fd);
 
-	// std::string _cleanse_buffer(const std::string& buffer,
-	// 							const std::string& chars_to_remove);
-	// std::vector<std::string> _split_buffer(const std::string& buffer,
-	// 									   const std::string& delimiter);
+	std::string _cleanse_buffer(const std::string& buffer,
+								const std::string& chars_to_remove);
+	std::vector<std::string> _split_buffer(const std::string& buffer,
+										   const std::string& delimiter);
 
-	// Client* _get_client(const int fd);
-	// Client* _get_client(const std::string nickname);
+	Client* _get_client(const int fd);
+	Client* _get_client(const std::string nickname);
 
-	// void _add_channel(Channel* channel);
-	// Channel* _get_channel(const std::string& channel_name);
+	void _add_channel(Channel* channel);
+	Channel* _get_channel(const std::string& channel_name);
 
-	// void _remove_client_fd(const int fd);
-	// void _remove_client_from_channels(const int fd);
-	// void _remove_client_from_server(const int fd);
+	void _remove_client_fd(const int fd);
+	void _remove_client_from_channels(const int fd);
+	void _remove_client_from_server(const int fd);
 };
 
-// std::string toupper(const std::string& str);
+std::string toupper(const std::string& str);
 
 #endif
