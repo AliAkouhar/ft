@@ -328,7 +328,6 @@ void Server::createSocket()
     }
 }
 
-
 void Server::creatEpoll()
 {
     epollFd = epoll_create1(0);
@@ -466,15 +465,9 @@ void Server::readSocket()
                     {
                         totalBytesRecieved += bytesRecv;
                         if (bytesRecv < MAX_BUFFER_SIZE)
-                        {
-                            buffer[totalBytesRecieved] = '\0';
-                            _execute_command(buffer, events[i].data.fd);
-                        }
+                            (buffer[totalBytesRecieved] = '\0', _execute_command(buffer, events[i].data.fd));
                         else
-                        {
                             std::cerr << "Buffer overflow detected, closing connection" << std::endl;
-                        }
-                        // buffer + '\0'; + fd of the client that triger the event
                     }
                 }
             }
