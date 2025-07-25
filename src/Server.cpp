@@ -417,6 +417,11 @@ static int makeSocketNonBlocking(int sfd)
     return 0;
 }
 
+void Server::closeSocket(int socketFd)
+{
+    close(socketFd);
+}
+
 void Server::acceptClient()
 {
     struct sockaddr_in clientAddr;
@@ -444,12 +449,6 @@ void Server::acceptClient()
         exit(1);
     }
 }
-
-void Server::closeSocket(int socketFd)
-{
-    close(socketFd);
-}
-
 
 // void Server::_accept_new_client()
 // {
@@ -480,7 +479,7 @@ void Server::closeSocket(int socketFd)
 // 	_fds.push_back(new_poll);
 // 	std::cout << GRE << "Client <" << incofd << "> Connected" << WHI
 // 			  << std::endl;
-}
+// }
 
 // void Server::_receive_new_data(const int fd)
 // {
@@ -511,7 +510,8 @@ void Server::readSocket()
 {
     while (1)
     {
-        struct epoll_event events[MAX_EVENTS];
+        struct epoll_event events[MAX_EVENTS];//instead of array of structs add an vector of structs that already is declared in the header
+
         int nfds = epoll_wait(epollFd, events, MAX_EVENTS, -1);
         if (nfds < 0)
         {
@@ -521,9 +521,12 @@ void Server::readSocket()
         for (int i = 0; i < nfds; i++)
         {
             if (events[i].data.fd == _server_fdsocket)
+            {
                 acceptClient();
+            }
             else
             {
+                //_receive_new_data(events[i].data.fd);
                 char buffer[MAX_BUFFER_SIZE];
                 if (events[i].events & EPOLLIN)
                 {
@@ -559,10 +562,10 @@ void Server::readSocket()
 
 void Server::setup()
 {
+   this->addSocketToEpoll();
+   this->listenSocket();
    this->createSocket();
    this->creatEpoll();
    this->bindSocket();
-   this->listenSocket();
-   this->addSocketToEpoll();
    this->readSocket();
 }
