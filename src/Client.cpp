@@ -38,13 +38,11 @@ std::string Client::get_ip_address() const { return _ip_addr; }
 
 void Client::set_buffer(const std::string& buffer) { _buffer = buffer; }
 
-
 void Client::set_nickname(const std::string& nickname) { _nickname = nickname; }
 
 void Client::set_username(const std::string& username) { _username = username; }
 
 void Client::set_password(const std::string& password) { _password = password; }
-
 
 void Client::set_is_authenticated(bool is_authenticated) {	_is_authenticated = is_authenticated;}
 
@@ -52,9 +50,7 @@ void Client::set_is_operator(bool is_operator) { _is_operator = is_operator; }
 
 void Client::set_is_logged(bool is_logged) { _is_logged = is_logged; }
 
-
 bool Client::get_is_authenticated() const { return _is_authenticated; }
-
 
 bool Client::get_is_operator() const { return _is_operator; }
 

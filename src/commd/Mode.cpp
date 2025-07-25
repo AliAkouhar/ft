@@ -20,7 +20,6 @@ void Server::_handler_client_mode(const std::string& buffer, const int fd)
 	std::istringstream iss(buffer);
 	std::string channelName, modeFlags, argument;\
 
-
 	iss >> channelName >> modeFlags;
 	if (iss >> argument)
 		iss >> argument;

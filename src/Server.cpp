@@ -99,25 +99,25 @@ void Server::_remove_client_from_server(const int fd)
 // }
 
 
-void Server::_remove_client_fd(const int fd)
-{
-	for (size_t i = 0; i < _fds.size(); i++)
-	{
-		if (_fds[i].fd == fd)
-		{
-			_fds.erase(_fds.begin() + i);
-			break;
-		}
-	}
-	close(fd);
-}
+// void Server::_remove_client_fd(const int fd)
+// {
+// 	for (size_t i = 0; i < _fds.size(); i++)
+// 	{
+// 		if (_fds[i].fd == fd)
+// 		{
+// 			_fds.erase(_fds.begin() + i);
+// 			break;
+// 		}
+// 	}
+// 	close(fd);
+// }
 
-void Server::_clear_client(const int fd)
-{
-	_remove_client_from_channels(fd);
-	_remove_client_from_server(fd);
-	_remove_client_fd(fd);
-}
+// void Server::_clear_client(const int fd)
+// {
+// 	_remove_client_from_channels(fd);
+// 	_remove_client_from_server(fd);
+// 	_remove_client_fd(fd);
+// }
 
 bool Server::_client_is_ready_to_login(const int fd)
 {
@@ -155,17 +155,17 @@ Client* Server::_get_client(const std::string nickname)
 	return NULL;
 }
 
-// Channel* Server::_get_channel(const std::string& channel_name)
-// {
-// 	for (size_t i = 0; i < _channels.size(); i++)
-// 	{
-// 		if (_channels[i]->get_name() == channel_name)
-// 		{
-// 			return _channels[i];
-// 		}
-// 	}
-// 	return NULL;
-// }
+Channel* Server::_get_channel(const std::string& channel_name)
+{
+	for (size_t i = 0; i < _channels.size(); i++)
+	{
+		if (_channels[i]->get_name() == channel_name)
+		{
+			return _channels[i];
+		}
+	}
+	return NULL;
+}
 
 void Server::_send_response(const int fd, const std::string& response)
 {
@@ -238,21 +238,42 @@ std::vector<std::string> _split_commd(const std::string& buffer,
     return tokens;
 }
 
-std::vector<std::string> _split_string(const std::string& s, char delimiter) {
-    std::vector<std::string> tokens;
-    size_t start = 0;
-    size_t end = s.find(delimiter);
 
-    while (end != std::string::npos) {
-        tokens.push_back(s.substr(start, end - start));
-        start = end + 1;
-        end = s.find(delimiter, start);
-    }
-    tokens.push_back(s.substr(start, std::string::npos));
-    return tokens;
+std::vector<std::string> Server::_split_buffer(const std::string& buffer,
+											   const std::string& delimiter)
+{
+	std::string command;
+	std::string parameters;
+	std::vector<std::string> tokens;
+	std::istringstream iss(buffer);
+
+	iss >> command;
+	tokens.push_back(command);
+
+	std::getline(iss >> std::ws, parameters);
+	parameters.erase(0, parameters.find_first_not_of(delimiter));
+	tokens.push_back(parameters);
+
+	return tokens;
 }
+
+// std::vector<std::string> _split_string(const std::string& s, char delimiter) {
+//     std::vector<std::string> tokens;
+//     size_t start = 0;
+//     size_t end = s.find(delimiter);
+
+//     while (end != std::string::npos) {
+//         tokens.push_back(s.substr(start, end - start));
+//         start = end + 1;
+//         end = s.find(delimiter, start);
+//     }
+//     tokens.push_back(s.substr(start, std::string::npos));
+//     return tokens;
+// }
+
 void Server::_handle_command(const std::string& command, const std::string& parameters, const int fd)
 {
+    std::cout << "hello its me 2" << std::cout;
     if (command == "PART")
         _handler_client_part(parameters, fd);
     else if (command == "JOIN")
@@ -291,6 +312,8 @@ void Server::_execute_command(const std::string buffer, const int fd)
 	if (splitted_buffer.empty())
 		return ;
 
+            std::cout << "hello its me" << std::cout;
+
 	std::string command = toupper(splitted_buffer[0]);
     if (splitted_buffer[1].empty())
         return ;
@@ -300,6 +323,8 @@ void Server::_execute_command(const std::string buffer, const int fd)
 }
 
 // SERVER METHODS
+
+void Server::_add_channel(Channel* channel) { _channels.push_back(channel); }
 
 Server::Server() : _port(7071), _server_fdsocket(-1){}
 
@@ -424,6 +449,63 @@ void Server::closeSocket(int socketFd)
 {
     close(socketFd);
 }
+
+
+// void Server::_accept_new_client()
+// {
+// 	Client cli;
+// 	struct pollfd new_poll;
+// 	struct sockaddr_in cli_addr;
+
+// 	memset(&cli_addr, 0, sizeof(cli_addr));
+// 	socklen_t len = sizeof(cli_addr);
+// 	int incofd = accept(_server_fdsocket, (sockaddr*)&(cli_addr), &len);
+// 	if (incofd == -1)
+// 	{
+// 		std::cout << "accept() failed" << std::endl;
+// 		return;
+// 	}
+// 	if (fcntl(incofd, F_SETFL, O_NONBLOCK) == -1)
+// 	{
+// 		std::cout << "fcntl() failed" << std::endl;
+// 		close(incofd);
+// 		return;
+// 	}
+// 	new_poll.fd = incofd;
+// 	new_poll.events = POLLIN;
+// 	new_poll.revents = 0;
+// 	cli.set_fd(incofd);
+// 	cli.set_ip_add(inet_ntoa((cli_addr.sin_addr)));
+// 	_clients.push_back(new Client(cli));
+// 	_fds.push_back(new_poll);
+// 	std::cout << GRE << "Client <" << incofd << "> Connected" << WHI
+// 			  << std::endl;
+}
+
+// void Server::_receive_new_data(const int fd)
+// {
+// 	char buffer[1024];
+// 	std::memset(buffer, 0, sizeof(buffer));
+
+// 	Client* cli = _get_client(fd);
+// 	ssize_t bytes = recv(fd, buffer, sizeof(buffer) - 1, 0);
+// 	if (bytes <= 0)
+// 	{
+// 		std::cout << RED << "Client <" << fd << "> Disconnected" << WHI
+// 				  << std::endl;
+// 		_clear_client(fd);
+// 	}
+// 	else
+// 	{
+// 		buffer[bytes] = '\0';
+// 		cli->append_to_buffer(buffer);
+// 		if (cli->get_buffer().find_first_of(CRLF) != std::string::npos)
+// 		{
+// 			_execute_command(cli->get_buffer(), fd);
+// 			cli->clear_buffer();
+// 		}
+// 	}
+// }
 
 void Server::readSocket()
 {

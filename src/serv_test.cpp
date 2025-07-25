@@ -1,88 +1,5 @@
 #include "Server.hpp"
 
-Server::Server()
-{
-	_hostname = "ft_irc.42.ma";
-	_reply_code = 0;
-	_port = 0;
-	_server_fdsocket = -1;
-	_password = "";
-	memset(&_server_addr, 0, sizeof(_server_addr));
-	_fds = std::vector<struct pollfd>();
-	_clients = std::vector<Client*>();
-	_channels = std::vector<Channel*>();
-}
-
-Server::Server(std::string password, std::vector<Client*> clients,
-			   std::vector<Channel*> channels)
-{
-	_hostname = "ft_irc.42.ma";
-	_reply_code = 0;
-	_port = 0;
-	_server_fdsocket = -1;
-	_password = password;
-	memset(&_server_addr, 0, sizeof(_server_addr));
-	_fds = std::vector<struct pollfd>();
-	this->_clients = clients;
-	this->_channels = channels;
-}
-
-Server::~Server()
-{
-	for (std::vector<Client*>::iterator it = _clients.begin();
-		 it != _clients.end();
-		 ++it)
-	{
-		delete *it;
-	}
-	_clients.clear();
-
-	for (std::vector<Channel*>::iterator it = _channels.begin();
-		 it != _channels.end();
-		 ++it)
-	{
-		delete *it;
-	}
-	_channels.clear();
-}
-
-std::string Server::_get_hostname() { return _hostname; }
-
-Client* Server::_get_client(const int fd)
-{
-	for (size_t i = 0; i < _clients.size(); i++)
-	{
-		if (_clients[i]->get_fd() == fd)
-		{
-			return _clients[i];
-		}
-	}
-	return NULL;
-}
-
-Client* Server::_get_client(const std::string nickname)
-{
-	for (size_t i = 0; i < _clients.size(); i++)
-	{
-		if (_clients[i]->get_nickname() == nickname)
-		{
-			return _clients[i];
-		}
-	}
-	return NULL;
-}
-
-Channel* Server::_get_channel(const std::string& channel_name)
-{
-	for (size_t i = 0; i < _channels.size(); i++)
-	{
-		if (_channels[i]->get_name() == channel_name)
-		{
-			return _channels[i];
-		}
-	}
-	return NULL;
-}
 
 // void Server::_set_server_socket()
 // {
@@ -217,19 +134,6 @@ Channel* Server::_get_channel(const std::string& channel_name)
 // 	}
 // }
 
-const Server::command_handler Server::_command_list[_command_list_size] = {
-	{"JOIN", &Server::_handler_client_join},
-	{"QUIT", &Server::_handler_client_quit},
-	{"PART", &Server::_handler_client_part},
-	{"MODE", &Server::_handler_client_mode},
-	{"KICK", &Server::_handler_client_kick},
-	{"TOPIC", &Server::_handler_client_topic},
-	{"NICK", &Server::_handler_client_nickname},
-	{"USER", &Server::_handler_client_username},
-	{"PASS", &Server::_handler_client_password},
-	{"INVITE", &Server::_handler_client_invite},
-	{"PRIVMSG", &Server::_handler_client_privmsg},
-};
 
 void Server::_execute_command(const std::string buffer, const int fd)
 {
@@ -315,6 +219,45 @@ std::string Server::_cleanse_buffer(const std::string& buffer,
 // 		close(_server_fdsocket);
 // 	}
 // }
+
+
+std::string Server::_get_hostname() { return _hostname; }
+
+Client* Server::_get_client(const int fd)
+{
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i]->get_fd() == fd)
+		{
+			return _clients[i];
+		}
+	}
+	return NULL;
+}
+
+Client* Server::_get_client(const std::string nickname)
+{
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i]->get_nickname() == nickname)
+		{
+			return _clients[i];
+		}
+	}
+	return NULL;
+}
+
+Channel* Server::_get_channel(const std::string& channel_name)
+{
+	for (size_t i = 0; i < _channels.size(); i++)
+	{
+		if (_channels[i]->get_name() == channel_name)
+		{
+			return _channels[i];
+		}
+	}
+	return NULL;
+}
 
 void Server::_remove_client_from_server(const int fd)
 {
