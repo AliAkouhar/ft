@@ -54,6 +54,7 @@ class Server
     void addSocketToEpoll();
     void acceptClient();
     void readSocket();
+    void handleClientData(int clientFd);
     void setup();
   private:
 	int _port;
@@ -62,7 +63,7 @@ class Server
 	std::string _hostname;
 	std::string _pass;
 	std::string _ip;
-	// std::vector<struct pollfd> _fds;
+	std::vector<struct epoll_event> _fds;
 	struct sockaddr_in _server_addr;
 	std::vector<Client*> _clients;
 	std::vector<Channel*> _channels;
@@ -76,7 +77,8 @@ class Server
 	bool _client_is_ready_to_login(const int fd);
 	bool _is_valid_nickname(const std::string& nickname);
 	bool _is_nickname_in_use(const int fd, const std::string& nickname);
-	void _handle_command(const std::string& command, const std::string& parameters, const int fd);
+	// COMMAND HANDLING COMMENTED OUT - TO BE HANDLED BY PARTNER
+	// void _handle_command(const std::string& command, const std::string& parameters, const int fd);
 	void _handler_client_join(const std::string& buffer, const int fd);
 	void _handler_client_quit(const std::string& buffer, const int fd);
 	void _handler_client_part(const std::string& buffer, const int fd);
@@ -93,7 +95,8 @@ class Server
 	// static bool _signal;
 	// void _clear_client(const int fd);
 
-	void _execute_command(const std::string buffer, const int fd);
+	// COMMAND EXECUTION COMMENTED OUT - TO BE HANDLED BY PARTNER
+	// void _execute_command(const std::string buffer, const int fd);
 
 	std::string _cleanse_buffer(const std::string& buffer,
 								const std::string& chars_to_remove);

@@ -4,7 +4,8 @@
 #include "../../inc/Replies.hpp"
 
 void Server::_handler_client_quit(const std::string& buffer, const int fd) {
-	std::cout << "This is quit command handler" << std::endl;
+	(void)buffer; // Suppress unused parameter warning
+	(void)fd;     // Suppress unused parameter warning
 
 	// Client* client = _get_client(fd);
 

@@ -271,56 +271,55 @@ std::vector<std::string> Server::_split_buffer(const std::string& buffer,
 //     return tokens;
 // }
 
-void Server::_handle_command(const std::string& command, const std::string& parameters, const int fd)
-{
-    std::cout << "hello its me 2" << std::cout;
-    if (command == "PART")
-        _handler_client_part(parameters, fd);
-    else if (command == "JOIN")
-        _handler_client_join(parameters, fd);
-    else if (command == "QUIT")
-        _handler_client_quit(parameters, fd);
-    else if (command == "MODE")
-        _handler_client_mode(parameters, fd);
-    else if (command == "KICK")
-        _handler_client_kick(parameters, fd);
-    else if (command == "TOPIC")
-        _handler_client_topic(parameters, fd);
-    else if (command == "NICK")
-        _handler_client_nickname(parameters, fd);
-    else if (command == "USER")
-        _handler_client_username(parameters, fd);
-    else if (command == "PASS")
-        _handler_client_password(parameters, fd);
-    else if (command == "INVITE")
-        _handler_client_invite(parameters, fd);
-    else if (command == "PRIVMSG")
-        _handler_client_privmsg(parameters, fd);
-    else
-        _send_response(fd, ERR_CMDNOTFOUND(command));
-}
+// COMMAND HANDLING COMMENTED OUT - TO BE HANDLED BY PARTNER
+// void Server::_handle_command(const std::string& command, const std::string& parameters, const int fd)
+// {
+//     if (command == "PART")
+//         _handler_client_part(parameters, fd);
+//     else if (command == "JOIN")
+//         _handler_client_join(parameters, fd);
+//     else if (command == "QUIT")
+//         _handler_client_quit(parameters, fd);
+//     else if (command == "MODE")
+//         _handler_client_mode(parameters, fd);
+//     else if (command == "KICK")
+//         _handler_client_kick(parameters, fd);
+//     else if (command == "TOPIC")
+//         _handler_client_topic(parameters, fd);
+//     else if (command == "NICK")
+//         _handler_client_nickname(parameters, fd);
+//     else if (command == "USER")
+//         _handler_client_username(parameters, fd);
+//     else if (command == "PASS")
+//         _handler_client_password(parameters, fd);
+//     else if (command == "INVITE")
+//         _handler_client_invite(parameters, fd);
+//     else if (command == "PRIVMSG")
+//         _handler_client_privmsg(parameters, fd);
+//     else
+//         _send_response(fd, ERR_CMDNOTFOUND(command));
+// }
 
-void Server::_execute_command(const std::string buffer, const int fd)
-{
-	if (buffer.empty()) 
-		return;
+// COMMAND EXECUTION COMMENTED OUT - TO BE HANDLED BY PARTNER
+// void Server::_execute_command(const std::string buffer, const int fd)
+// {
+// 	if (buffer.empty()) 
+// 		return;
 
-	// std::string clean_buffer = _cleanse_buffer(buffer, CRLF);
-	std::vector<std::string> splitted_buffer =
-		_split_commd(buffer, SPACE);
+// 	// std::string clean_buffer = _cleanse_buffer(buffer, CRLF);
+// 	std::vector<std::string> splitted_buffer =
+// 		_split_commd(buffer, SPACE);
 
-	if (splitted_buffer.empty())
-		return ;
+// 	if (splitted_buffer.empty())
+// 		return ;
 
-            std::cout << "hello its me" << std::cout;
+// 	std::string command = toupper(splitted_buffer[0]);
+//     if (splitted_buffer[1].empty())
+//         return ;
+//     std::string parameters = splitted_buffer[1];
 
-	std::string command = toupper(splitted_buffer[0]);
-    if (splitted_buffer[1].empty())
-        return ;
-	std::string parameters = splitted_buffer[1];
-
-	_handle_command(command, parameters, fd);
-}
+// 	_handle_command(command, parameters, fd);
+// }
 
 // SERVER METHODS
 
@@ -330,7 +329,7 @@ Server::Server() : _port(7071), _server_fdsocket(-1){}
 
 Server::Server(char **av)
 {
-    // std::cout << "find" <<av[1] <<  std::endl;
+    _fds.resize(MAX_EVENTS); // Initialize the epoll events vector
     _port = atoi(av[1]);
     _pass = av[2];
     _ip = "127.0.0.1";
@@ -349,6 +348,14 @@ void Server::createSocket()
     if (_server_fdsocket < 0)
     {
         std::cerr << "socket" << std::endl;
+        exit(1);
+    }
+    
+    // Enable socket address reuse to avoid "Address already in use" errors
+    int opt = 1;
+    if (setsockopt(_server_fdsocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+    {
+        std::cerr << "setsockopt SO_REUSEADDR failed" << std::endl;
         exit(1);
     }
 }
@@ -388,6 +395,7 @@ void Server::addSocketToEpoll()
     struct epoll_event ev;
     ev.events = EPOLLIN;
     ev.data.fd = _server_fdsocket;
+    
     int res = epoll_ctl(epollFd, EPOLL_CTL_ADD, _server_fdsocket, &ev);
     if (res < 0)
     {
@@ -439,15 +447,33 @@ void Server::acceptClient()
         closeSocket(clientFd);
         exit(1);
     }
+    
+    // Create new Client object
+    Client* newClient = new Client();
+    newClient->set_fd(clientFd);
+    
+    // Set client IP address
+    char clientIP[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &(clientAddr.sin_addr), clientIP, INET_ADDRSTRLEN);
+    newClient->set_ip_add(std::string(clientIP));
+    
+    // Add client to our clients vector
+    _clients.push_back(newClient);
+    
     struct epoll_event event;
     event.data.fd = clientFd;
     event.events = EPOLLIN;
+    
     if (epoll_ctl(epollFd, EPOLL_CTL_ADD, clientFd, &event) < 0)
     {
         std::cerr << "Failed to add client socket to epoll" << std::endl;
+        delete newClient;
+        _clients.pop_back();
         closeSocket(clientFd);
         exit(1);
     }
+    
+    std::cout << "New client connected: " << clientIP << " (fd: " << clientFd << ")" << std::endl;
 }
 
 // void Server::_accept_new_client()
@@ -506,13 +532,103 @@ void Server::acceptClient()
 // 	}
 // }
 
+void Server::handleClientData(int clientFd)
+{
+    char buffer[MAX_BUFFER_SIZE];
+    Client* client = _get_client(clientFd);
+    if (!client)
+    {
+        std::cerr << "Client not found for fd: " << clientFd << std::endl;
+        closeSocket(clientFd);
+        epoll_ctl(epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+        return;
+    }
+    
+    int bytesRecv = recv(clientFd, buffer, MAX_BUFFER_SIZE - 1, 0);
+    if (bytesRecv == 0)
+    {
+        std::cout << "Client disconnected (fd: " << clientFd << ")" << std::endl;
+        // Remove client from vector
+        for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+        {
+            if ((*it)->get_fd() == clientFd)
+            {
+                delete *it;
+                _clients.erase(it);
+                break;
+            }
+        }
+        closeSocket(clientFd);
+        epoll_ctl(epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+        return;
+    }
+    else if (bytesRecv < 0)
+    {
+        std::cerr << "Error when receiving data from fd: " << clientFd << std::endl;
+        // Remove client from vector
+        for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+        {
+            if ((*it)->get_fd() == clientFd)
+            {
+                delete *it;
+                _clients.erase(it);
+                break;
+            }
+        }
+        closeSocket(clientFd);
+        epoll_ctl(epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+        return;
+    }
+    else
+    {
+        // Null-terminate the received data
+        buffer[bytesRecv] = '\0';
+        client->append_to_buffer(std::string(buffer));        
+        std::string clientBuffer = client->get_buffer();
+        std::string::size_type pos = 0;
+        
+        while ((pos = clientBuffer.find("\r\n")) != std::string::npos)
+        {
+            std::string completeMessage = clientBuffer.substr(0, pos);
+            
+            // Remove the complete message from the buffer            
+            clientBuffer = clientBuffer.substr(pos + 2);
+            
+            if (!completeMessage.empty())
+            {
+                std::cout << "=== COMPLETE MESSAGE RECEIVED ===" << std::endl;
+                std::cout << "Client FD: " << clientFd << std::endl;
+                std::cout << "Client IP: " << client->get_ip_address() << std::endl;
+                std::cout << "Message: '" << completeMessage << "'" << std::endl;
+                std::cout << "==================================" << std::endl;
+    
+                // _execute_command(completeMessage.c_str(), clientFd);
+            }
+        }
+        
+        // Update client buffer with remaining partial data
+        client->set_buffer(clientBuffer);
+        
+        // Show partial buffer information if there's remaining data
+        if (!clientBuffer.empty())
+        {
+            std::cout << "--- PARTIAL BUFFER ---" << std::endl;
+            std::cout << "Client FD: " << clientFd << std::endl;
+            std::cout << "Client IP: " << client->get_ip_address() << std::endl;
+            std::cout << "Partial Buffer: '" << clientBuffer << "'" << std::endl;
+            std::cout << "Buffer Length: " << clientBuffer.length() << " bytes" << std::endl;
+            std::cout << "Waiting for \\r\\n delimiter..." << std::endl;
+            std::cout << "----------------------" << std::endl;
+        }
+    }
+}
+
 void Server::readSocket()
 {
     while (1)
     {
-        struct epoll_event events[MAX_EVENTS];//instead of array of structs add an vector of structs that already is declared in the header
-
-        int nfds = epoll_wait(epollFd, events, MAX_EVENTS, -1);
+        // Use the _fds vector instead of local array
+        int nfds = epoll_wait(epollFd, _fds.data(), MAX_EVENTS, -1);
         if (nfds < 0)
         {
             std::cerr << "Error in epoll_wait" << std::endl;
@@ -520,41 +636,15 @@ void Server::readSocket()
         }
         for (int i = 0; i < nfds; i++)
         {
-            if (events[i].data.fd == _server_fdsocket)
+            if (_fds[i].data.fd == _server_fdsocket)
             {
+                // Handle new client connection
                 acceptClient();
             }
-            else
+            else if (_fds[i].events & EPOLLIN)
             {
-                //_receive_new_data(events[i].data.fd);
-                char buffer[MAX_BUFFER_SIZE];
-                if (events[i].events & EPOLLIN)
-                {
-                    int totalBytesRecieved = 0;
-                    int bytesRecv = recv(events[i].data.fd, buffer + totalBytesRecieved, MAX_BUFFER_SIZE - totalBytesRecieved, 0);
-                    if (bytesRecv == 0)
-                    {
-                        std::cout << "Client disconnected" << std::endl;
-                        closeSocket(events[i].data.fd);
-                        epoll_ctl(epollFd, EPOLL_CTL_DEL, events[i].data.fd, NULL);
-                        break;
-                    }
-                    else if (bytesRecv < 0)
-                    {
-                        std::cerr << "Error when receiving data" << std::endl;
-                        closeSocket(events[i].data.fd);
-                        epoll_ctl(epollFd, EPOLL_CTL_DEL, events[i].data.fd, NULL);
-                        break;
-                    }
-                    else
-                    {
-                        totalBytesRecieved += bytesRecv;
-                        if (bytesRecv < MAX_BUFFER_SIZE)
-                            (buffer[totalBytesRecieved] = '\0', _execute_command(buffer, events[i].data.fd));
-                        else
-                            std::cerr << "Buffer overflow detected, closing connection" << std::endl;
-                    }
-                }
+                // Handle existing client data
+                handleClientData(_fds[i].data.fd);
             }
         }
     }
@@ -562,10 +652,10 @@ void Server::readSocket()
 
 void Server::setup()
 {
-   this->addSocketToEpoll();
-   this->listenSocket();
    this->createSocket();
    this->creatEpoll();
    this->bindSocket();
+   this->listenSocket();
+   this->addSocketToEpoll();
    this->readSocket();
 }
