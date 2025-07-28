@@ -238,7 +238,6 @@ std::vector<std::string> _split_commd(const std::string& buffer,
     return tokens;
 }
 
-
 std::vector<std::string> Server::_split_buffer(const std::string& buffer,
 											   const std::string& delimiter)
 {
@@ -596,11 +595,11 @@ void Server::handleClientData(int clientFd)
             
             if (!completeMessage.empty())
             {
-                std::cout << "=== COMPLETE MESSAGE RECEIVED ===" << std::endl;
-                std::cout << "Client FD: " << clientFd << std::endl;
-                std::cout << "Client IP: " << client->get_ip_address() << std::endl;
-                std::cout << "Message: '" << completeMessage << "'" << std::endl;
-                std::cout << "==================================" << std::endl;
+                // std::cout << "=== COMPLETE MESSAGE RECEIVED ===" << std::endl;
+                // std::cout << "Client FD: " << clientFd << std::endl;
+                // std::cout << "Client IP: " << client->get_ip_address() << std::endl;
+                // std::cout << "Message: '" << completeMessage << "'" << std::endl;
+                // std::cout << "==================================" << std::endl;
     
                 // _execute_command(completeMessage.c_str(), clientFd);
             }
