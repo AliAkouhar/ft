@@ -1,6 +1,6 @@
 #include "../inc/Server.hpp"
 
-// ft_irc port passwd
+/*  ft_irc port passwd */
 
 int main(int ac, char **av)
 {

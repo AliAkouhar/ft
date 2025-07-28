@@ -26,5 +26,7 @@ void Server::_handler_client_password(const std::string& buffer, const int fd)
 	{
 		client->set_is_authenticated(true);
 		_reply_code = 200;
+
+		std::cout << "Client authenticated successfully: " << client->get_nickname() << std::endl;
 	}
 }

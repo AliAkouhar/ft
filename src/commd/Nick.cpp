@@ -12,10 +12,10 @@ void Server::_handler_client_nickname(const std::string& buffer, const int fd)
         _send_response(fd, ERR_NEEDMOREPARAMS(std::string("*")));
 		_reply_code = 461;
     }
-    else if (client->get_already_registered())
+    else if (!client->get_is_authenticated())
     {
-        _send_response(fd, ERR_ALREADYREGISTERED(client->get_nickname()));
-		_reply_code = 462;
+        _send_response(fd, ERR_NOTREGISTERED(std::string("*")));
+		_reply_code = 451;
     }
     else if (!_is_valid_nickname(buffer))
     {

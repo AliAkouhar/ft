@@ -3,58 +3,27 @@
 #include "../inc/Client.hpp"
 #include "../inc/Replies.hpp"
 
-
 #define MAX_EVENTS 20
 #define MAX_BUFFER_SIZE 4096
 
-// Server::Server()
-// {
-// 	_hostname = "ft_irc.ma";
-// 	_reply_code = 0;
-// 	_port = 1337;
-// 	_server_fdsocket = -1;
-// 	_password = "";
-// 	memset(&_server_addr, 0, sizeof(_server_addr));
-// 	// _fds = std::vector<struct pollfd>();
-// 	_clients = std::vector<Client*>();
-// 	_channels = std::vector<Channel*>();
-// }
+Server::~Server()
+{
+	for (std::vector<Client*>::iterator it = _clients.begin();
+		 it != _clients.end();
+		 ++it)
+	{
+		delete *it;
+	}
+	_clients.clear();
 
-// Server::Server(std::string password, std::vector<Client*> clients,
-// 			   std::vector<Channel*> channels)
-// {
-// 	_hostname = "ft_irc.ma";
-// 	_reply_code = 0;
-// 	_port = 1337;
-// 	_server_fdsocket = -1;
-// 	_password = password;
-// 	memset(&_server_addr, 0, sizeof(_server_addr));
-// 	// _fds = std::vector<struct pollfd>();
-// 	this->_clients = clients;
-// 	this->_channels = channels;
-// }
-//Ali
-
-
-
-// Server::~Server()
-// {
-// 	for (std::vector<Client*>::iterator it = _clients.begin();
-// 		 it != _clients.end();
-// 		 ++it)
-// 	{
-// 		delete *it;
-// 	}
-// 	_clients.clear();
-
-// 	for (std::vector<Channel*>::iterator it = _channels.begin();
-// 		 it != _channels.end();
-// 		 ++it)
-// 	{
-// 		delete *it;
-// 	}
-// 	_channels.clear();
-// }
+	for (std::vector<Channel*>::iterator it = _channels.begin();
+		 it != _channels.end();
+		 ++it)
+	{
+		delete *it;
+	}
+	_channels.clear();
+}
 //ALI
 
 void Server::_remove_client_from_server(const int fd)
@@ -65,7 +34,7 @@ void Server::_remove_client_from_server(const int fd)
 	{
 		if ((*it)->get_fd() == fd)
 		{
-			delete *it;
+        	delete *it;
 			*it = NULL;
 			it = _clients.erase(it);
 			break;
@@ -73,51 +42,38 @@ void Server::_remove_client_from_server(const int fd)
 	}
 }
 
-// void Server::_remove_client_fd(const int fd)
-// {
-// 	for (size_t i = 0; i < _fds.size(); i++)
-// 	{
-// 		if (_fds[i].fd == fd)
-// 		{
-// 			_fds.erase(_fds.begin() + i);
-// 			break;
-// 		}
-// 	}
-// 	close(fd);
-// }
+void Server::_remove_client_from_channels(const int fd)
+{
+	Client* client = _get_client(fd);
 
-// void Server::_remove_client_from_channels(const int fd)
-// {
-// 	Client* client = _get_client(fd);
-
-// 	for (std::vector<Channel*>::iterator it = _channels.begin();
-// 		 it != _channels.end();
-// 		 ++it)
-// 	{
-// 		(*it)->remove_channel_client(client);
-// 	}
-// }
+	for (std::vector<Channel*>::iterator it = _channels.begin();
+		 it != _channels.end();
+		 ++it)
+	{
+		(*it)->remove_channel_client(client);
+	}
+}
 
 
-// void Server::_remove_client_fd(const int fd)
-// {
-// 	for (size_t i = 0; i < _fds.size(); i++)
-// 	{
-// 		if (_fds[i].fd == fd)
-// 		{
-// 			_fds.erase(_fds.begin() + i);
-// 			break;
-// 		}
-// 	}
-// 	close(fd);
-// }
+void Server::_remove_client_fd(const int fd)
+{
+	for (size_t i = 0; i < _fds.size(); i++)
+	{
+		if (_fds[i].data.fd == fd)
+		{
+			_fds.erase(_fds.begin() + i);
+			break;
+		}
+	}
+	close(fd);
+}
 
-// void Server::_clear_client(const int fd)
-// {
-// 	_remove_client_from_channels(fd);
-// 	_remove_client_from_server(fd);
-// 	_remove_client_fd(fd);
-// }
+void Server::_clear_client(const int fd)
+{
+	_remove_client_from_channels(fd);
+	// _remove_client_from_server(fd);
+	_remove_client_fd(fd);
+}
 
 bool Server::_client_is_ready_to_login(const int fd)
 {
@@ -270,55 +226,55 @@ std::vector<std::string> Server::_split_buffer(const std::string& buffer,
 //     return tokens;
 // }
 
-// COMMAND HANDLING COMMENTED OUT - TO BE HANDLED BY PARTNER
-// void Server::_handle_command(const std::string& command, const std::string& parameters, const int fd)
-// {
-//     if (command == "PART")
-//         _handler_client_part(parameters, fd);
-//     else if (command == "JOIN")
-//         _handler_client_join(parameters, fd);
-//     else if (command == "QUIT")
-//         _handler_client_quit(parameters, fd);
-//     else if (command == "MODE")
-//         _handler_client_mode(parameters, fd);
-//     else if (command == "KICK")
-//         _handler_client_kick(parameters, fd);
-//     else if (command == "TOPIC")
-//         _handler_client_topic(parameters, fd);
-//     else if (command == "NICK")
-//         _handler_client_nickname(parameters, fd);
-//     else if (command == "USER")
-//         _handler_client_username(parameters, fd);
-//     else if (command == "PASS")
-//         _handler_client_password(parameters, fd);
-//     else if (command == "INVITE")
-//         _handler_client_invite(parameters, fd);
-//     else if (command == "PRIVMSG")
-//         _handler_client_privmsg(parameters, fd);
-//     else
-//         _send_response(fd, ERR_CMDNOTFOUND(command));
-// }
+// Ctrl+V, then Ctrl+M for \r, and Ctrl+V, Ctrl+J for \n
 
-// COMMAND EXECUTION COMMENTED OUT - TO BE HANDLED BY PARTNER
-// void Server::_execute_command(const std::string buffer, const int fd)
-// {
-// 	if (buffer.empty()) 
-// 		return;
+void Server::_handle_command(const std::string& command, const std::string& parameters, const int fd)
+{
+    if (command == "PART")
+        _handler_client_part(parameters, fd);
+    else if (command == "JOIN")
+        _handler_client_join(parameters, fd);
+    else if (command == "QUIT")
+        _handler_client_quit(parameters, fd);
+    else if (command == "MODE")
+        _handler_client_mode(parameters, fd);
+    else if (command == "KICK")
+        _handler_client_kick(parameters, fd);
+    else if (command == "TOPIC")
+        _handler_client_topic(parameters, fd);
+    else if (command == "NICK")
+        _handler_client_nickname(parameters, fd);
+    else if (command == "USER")
+        _handler_client_username(parameters, fd);
+    else if (command == "PASS")
+        _handler_client_password(parameters, fd);
+    else if (command == "INVITE")
+        _handler_client_invite(parameters, fd);
+    else if (command == "PRIVMSG")
+        _handler_client_privmsg(parameters, fd);
+    else
+        _send_response(fd, ERR_CMDNOTFOUND(command));
+}
 
-// 	// std::string clean_buffer = _cleanse_buffer(buffer, CRLF);
-// 	std::vector<std::string> splitted_buffer =
-// 		_split_commd(buffer, SPACE);
+void Server::_execute_command(const std::string buffer, const int fd)
+{
+	if (buffer.empty()) 
+		return;
 
-// 	if (splitted_buffer.empty())
-// 		return ;
+	std::string clean_buffer = _cleanse_buffer(buffer, CRLF);
+	std::vector<std::string> splitted_buffer =
+		_split_commd(buffer, SPACE);
 
-// 	std::string command = toupper(splitted_buffer[0]);
-//     if (splitted_buffer[1].empty())
-//         return ;
-//     std::string parameters = splitted_buffer[1];
+	if (splitted_buffer.empty())
+		return ;
 
-// 	_handle_command(command, parameters, fd);
-// }
+	std::string command = toupper(splitted_buffer[0]);
+    if (splitted_buffer[1].empty())
+        return ;
+    std::string parameters = splitted_buffer[1];
+
+	_handle_command(command, parameters, fd);
+}
 
 // SERVER METHODS
 
@@ -338,8 +294,6 @@ Server::Server(char **av)
     _server_addr.sin_addr.s_addr = INADDR_ANY;
     _server_addr.sin_port = htons(_port);
 }
-
-Server::~Server() {}
 
 void Server::createSocket()
 {
@@ -475,61 +429,6 @@ void Server::acceptClient()
     std::cout << "New client connected: " << clientIP << " (fd: " << clientFd << ")" << std::endl;
 }
 
-// void Server::_accept_new_client()
-// {
-// 	Client cli;
-// 	struct pollfd new_poll;
-// 	struct sockaddr_in cli_addr;
-
-// 	memset(&cli_addr, 0, sizeof(cli_addr));
-// 	socklen_t len = sizeof(cli_addr);
-// 	int incofd = accept(_server_fdsocket, (sockaddr*)&(cli_addr), &len);
-// 	if (incofd == -1)
-// 	{
-// 		std::cout << "accept() failed" << std::endl;
-// 		return;
-// 	}
-// 	if (fcntl(incofd, F_SETFL, O_NONBLOCK) == -1)
-// 	{
-// 		std::cout << "fcntl() failed" << std::endl;
-// 		close(incofd);
-// 		return;
-// 	}
-// 	new_poll.fd = incofd;
-// 	new_poll.events = POLLIN;
-// 	new_poll.revents = 0;
-// 	cli.set_fd(incofd);
-// 	cli.set_ip_add(inet_ntoa((cli_addr.sin_addr)));
-// 	_clients.push_back(new Client(cli));
-// 	_fds.push_back(new_poll);
-// 	std::cout << GRE << "Client <" << incofd << "> Connected" << WHI
-// 			  << std::endl;
-// }
-
-// void Server::_receive_new_data(const int fd)
-// {
-// 	char buffer[1024];
-// 	std::memset(buffer, 0, sizeof(buffer));
-
-// 	Client* cli = _get_client(fd);
-// 	ssize_t bytes = recv(fd, buffer, sizeof(buffer) - 1, 0);
-// 	if (bytes <= 0)
-// 	{
-// 		std::cout << RED << "Client <" << fd << "> Disconnected" << WHI
-// 				  << std::endl;
-// 		_clear_client(fd);
-// 	}
-// 	else
-// 	{
-// 		buffer[bytes] = '\0';
-// 		cli->append_to_buffer(buffer);
-// 		if (cli->get_buffer().find_first_of(CRLF) != std::string::npos)
-// 		{
-// 			_execute_command(cli->get_buffer(), fd);
-// 			cli->clear_buffer();
-// 		}
-// 	}
-// }
 
 void Server::handleClientData(int clientFd)
 {
@@ -596,12 +495,7 @@ void Server::handleClientData(int clientFd)
             if (!completeMessage.empty())
             {
                 // std::cout << "=== COMPLETE MESSAGE RECEIVED ===" << std::endl;
-                // std::cout << "Client FD: " << clientFd << std::endl;
-                // std::cout << "Client IP: " << client->get_ip_address() << std::endl;
-                // std::cout << "Message: '" << completeMessage << "'" << std::endl;
-                // std::cout << "==================================" << std::endl;
-    
-                // _execute_command(completeMessage.c_str(), clientFd);
+                _execute_command(completeMessage.c_str(), clientFd);
             }
         }
         

@@ -12,7 +12,6 @@ void Server::_handler_client_join(const std::string& buffer, const int fd) {
 		_reply_code = 461;
 		return;
 	}
-
 	if (!client->get_is_logged()) {
 		_send_response(fd, ERR_NOTREGISTERED(client->get_nickname()));
 		_reply_code = 451;
