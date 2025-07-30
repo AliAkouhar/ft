@@ -1,0 +1,42 @@
+# add the server then connecting (you should complete the user registration pass + nick + user)
+
+/server add myirc localhost/1337 -password=pass -ssl=off
+/connect myirc
+
+#if the server disconnect try 
+/set irc.server.myirc.capabilities off
+/set irc.server.myirc.tls off
+
+/reconnect
+
+
+#weechat tests 
+
+/quote PASS pass
+/quote NICK testuser
+/quote USER testuser 0 * :Test User
+
+/join #testchannel
+
+/quote PRIVMSG #testchannel :Hello everyone!
+/quote PRIVMSG testuser :Hello to myself!
+
+/quote MODE #testchannel +i           # Set invite-only mode
+/quote MODE #testchannel -i           # Remove invite-only mode
+/quote MODE #testchannel +k secret   # Set channel key
+/quote MODE #testchannel -k           # Remove channel key
+/quote MODE #testchannel +o testuser  # Set operator mode to testuser
+/quote MODE #testchannel -o testuser  # Remove operator mode
+/quote MODE #testchannel +l 10        # Set user limit
+/quote MODE #testchannel -l           # Remove user limit
+
+/part #testchannel :Leaving channel
+
+/quote INVITE otheruser #testchannel
+
+/quote TOPIC #testchannel :New channel topic
+/quote TOPIC #testchannel             # Get current topic
+
+/quit :Goodbye message
+
+

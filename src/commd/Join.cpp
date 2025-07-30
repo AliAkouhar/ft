@@ -12,6 +12,7 @@ void Server::_handler_client_join(const std::string& buffer, const int fd) {
 		_reply_code = 461;
 		return;
 	}
+
 	if (!client->get_is_logged()) {
 		_send_response(fd, ERR_NOTREGISTERED(client->get_nickname()));
 		_reply_code = 451;
@@ -19,7 +20,6 @@ void Server::_handler_client_join(const std::string& buffer, const int fd) {
 	}
 
 	std::string channel_name = params[0];
-	std::string channel_key = (params.size() > 1) ? params[1] : "";
 
 	if (channel_name.empty() || channel_name[0] != '#') {
 		_send_response(fd, ERR_BADCHANMASK(_get_hostname(), client->get_nickname(), channel_name));
@@ -34,7 +34,9 @@ void Server::_handler_client_join(const std::string& buffer, const int fd) {
 		_add_channel(channel);
 		channel->join(client);
 		channel->set_channel_operator(client);
-	} else {
+	}
+	else 
+	{
 		if (channel->has_client(client)) {
 			_send_response(fd, ERR_ALREADYREGISTERED(client->get_nickname()));
 			_reply_code = 462;
@@ -47,7 +49,6 @@ void Server::_handler_client_join(const std::string& buffer, const int fd) {
 			_reply_code = 473;
 			return;
 		}
-
 		channel->join(client);
 	}
     

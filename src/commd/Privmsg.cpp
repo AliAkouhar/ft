@@ -41,14 +41,13 @@ void Server::_handler_client_privmsg(const std::string& buffer, const int fd) {
 			if (!channel) {
 				_send_response(fd, ERR_NOSUCHCHANNEL(target));
 				_reply_code = 403;
-				continue;
+				return;
 			}
 			if (!channel->has_client(client)) {
 				_send_response(fd, ERR_NOTONCHANNEL(client->get_nickname()));
 				_reply_code = 442;
-				continue;
+				return;
 			}
-			channel->broadcast(client, channel->get_name(), message);
 		}
 		else {
 			Client* target_client = _get_client(target);
@@ -56,8 +55,20 @@ void Server::_handler_client_privmsg(const std::string& buffer, const int fd) {
 				_send_response(fd, ERR_NOSUCHNICK(std::string(""),
 												  client->get_nickname()));
 				_reply_code = 401;
-				continue;
+				return;
 			}
+		}
+	}
+
+	for (std::vector<std::string>::iterator it = receivers.begin(); it != receivers.end(); ++it) {
+		const std::string& target = *it;
+
+		if (target[0] == '#') {
+			Channel* channel = _get_channel(target);
+			channel->broadcast(client, channel->get_name(), message);
+		}
+		else {
+			Client* target_client = _get_client(target);
 			_send_response(target_client->get_fd(), RPL_PRIVMSG(
 				client->get_nickname(),
 				client->get_hostname(),

@@ -10,7 +10,6 @@ NAME = irc_serv
 OBJ_DIR = obj
 
 # Convert src paths to obj paths
-
 OBJ = $(patsubst src/%.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
 all: $(NAME)
@@ -20,10 +19,8 @@ $(OBJ_DIR)/%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(NAME): $(OBJ)
-	# @echo "Linking objects into executable $(NAME)\n"
 	$(CXX) $(CXXFLAGS) $(OBJ) -o $(NAME)
-	# @echo "Hey, I removed the flags LOL :> !\n"
-	@rm -rf $(OBJ_DIR)
+	# Remove this line: @rm -rf $(OBJ_DIR)
 
 clean: 
 	rm -rf $(OBJ_DIR)
@@ -32,5 +29,5 @@ fclean: clean
 	rm -rf $(NAME)
 
 re: fclean all
-
+	
 .PHONY: all clean fclean re

@@ -11,32 +11,35 @@ void Server::_handler_client_username(const std::string& buffer, const int fd)
 	{
 		_send_response(fd, ERR_NEEDMOREPARAMS(std::string("*")));
 		_reply_code = 461;
+		return ;
 	}
-	else if (!client || !client->get_is_authenticated())
+
+	if (!client || !client->get_is_authenticated())
 	{
 		_send_response(fd, ERR_NOTREGISTERED(std::string("*")));
 		_reply_code = 451;
+		return 
 	}
-	else if (!client->get_already_registered())
+	
+	if (!client->get_already_registered())
 	{
 		_send_response(fd, ERR_ALREADYREGISTERED(client->get_nickname()));
 		_reply_code = 462;
+		return ;
+	}
+
+	client->set_username(buffer);
+	if (_client_is_ready_to_login(fd))
+	{
+		client->set_is_logged(fd); 	
+		_send_response(fd,
+						RPL_CONNECTED(_get_hostname(),
+										client->get_nickname(),
+										client->get_hostname()));
+		_reply_code = 001;
 	}
 	else
 	{
-		client->set_username(buffer);
-		if (_client_is_ready_to_login(fd))
-		{
-			client->set_is_logged(fd); 	
-			_send_response(fd,
-						   RPL_CONNECTED(_get_hostname(),
-										 client->get_nickname(),
-										 client->get_hostname()));
-			_reply_code = 001;
-		}
-		else
-		{
-			_reply_code = 200;
-		}
+		_reply_code = 200;
 	}
 }

@@ -27,38 +27,39 @@ void Server::_handler_client_part(const std::string& buffer, const int fd)
     {
         _send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
         _reply_code = 461;
+        return ;
     }
-    else if (!client->get_is_logged())
+    
+    if (!client->get_is_logged())
     {
         _send_response(fd, ERR_USERNOTINCHANNEL(nickname, param[0]));
         _reply_code = 451;
+        return 
     }
-    else
-    {
-        std::vector<std::string> channels = _split_string(buffer, ',');
-        for (size_t i = 0; i < channels.size(); ++i) {
-            std::string& channel_name = channels[i];
-                        
-            Channel* channel = _get_channel(channel_name);
-            if (!channel)
-            {
-                _send_response(fd, ERR_NOSUCHCHANNEL(channel_name));
-                _reply_code = 403;
-            }
-            else if (!channel->has_client(client))
-            {
-                _send_response(fd, ERR_NOTONCHANNEL(channel_name));
-                _reply_code = 442;
-            }
-            else
-            {
-                channel->part(client);
-                _send_response(fd,
-                    RPL_PART(client->get_hostname(),
-                    channel_name,
-                    nickname));
-                    _reply_code = 200;
-            }
+    
+    std::vector<std::string> channels = _split_string(buffer, ',');
+    for (size_t i = 0; i < channels.size(); ++i) {
+        std::string& channel_name = channels[i];
+                    
+        Channel* channel = _get_channel(channel_name);
+        if (!channel)
+        {
+            _send_response(fd, ERR_NOSUCHCHANNEL(channel_name));
+            _reply_code = 403;
+        }
+        else if (!channel->has_client(client))
+        {
+            _send_response(fd, ERR_NOTONCHANNEL(channel_name));
+            _reply_code = 442;
+        }
+        else
+        {
+            channel->part(client);
+            _send_response(fd,
+                RPL_PART(client->get_hostname(),
+                channel_name,
+                nickname));
+                _reply_code = 200;
         }
     }
 }
