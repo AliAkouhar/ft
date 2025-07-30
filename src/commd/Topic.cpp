@@ -9,9 +9,9 @@
  * Reference: https://datatracker.ietf.org/doc/html/rfc1459#section-4.2.4
  */
 
-void Server::_handler_client_topic(const std::string& buffer, const int fd) {
-	Client* client = _get_client(fd);
+void Server::_ft_topic(const std::string& buffer, const int fd) {
 	std::vector<std::string> params = _split_buffer(buffer, SPACE);
+	Client* client = _get_client(fd);
 
 	if (params.size() < 1) {
 		_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));

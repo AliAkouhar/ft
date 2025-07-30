@@ -54,7 +54,6 @@ void Server::_remove_client_from_channels(const int fd)
 	}
 }
 
-
 void Server::_remove_client_fd(const int fd)
 {
 	for (size_t i = 0; i < _fds.size(); i++)
@@ -127,7 +126,7 @@ void Server::_send_response(const int fd, const std::string& response)
 {
 	std::cout << "Response:\n" << response;
 	if (send(fd, response.c_str(), response.size(), 0) == -1)
-		std::cerr << "Response send() failed" << std::endl;
+		std::cerr << "Responsed sending failed" << std::endl;
 }
 
 std::string toupper(const std::string& str)
@@ -140,7 +139,7 @@ std::string toupper(const std::string& str)
 	return result;
 }
 
-std::string Server::_cleanse_buffer(const std::string& buffer,
+std::string Server::_remove_rn(const std::string& buffer,
 									const std::string& chars_to_remove)
 {
 	std::string clean_buffer;
@@ -212,56 +211,42 @@ std::vector<std::string> Server::_split_buffer(const std::string& buffer,
 	return tokens;
 }
 
-// std::vector<std::string> _split_string(const std::string& s, char delimiter) {
-//     std::vector<std::string> tokens;
-//     size_t start = 0;
-//     size_t end = s.find(delimiter);
-
-//     while (end != std::string::npos) {
-//         tokens.push_back(s.substr(start, end - start));
-//         start = end + 1;
-//         end = s.find(delimiter, start);
-//     }
-//     tokens.push_back(s.substr(start, std::string::npos));
-//     return tokens;
-// }
-
 // Ctrl+V, then Ctrl+M for \r, and Ctrl+V, Ctrl+J for \n
 
-void Server::_handle_command(const std::string& command, const std::string& parameters, const int fd)
+void Server::_handle_commands(const std::string& command, const std::string& parameters, const int fd)
 {
     if (command == "PART")
-        _handler_client_part(parameters, fd);
+        _ft_part(parameters, fd);
     else if (command == "JOIN")
-        _handler_client_join(parameters, fd);
+        _ft_join(parameters, fd);
     else if (command == "QUIT")
-        _handler_client_quit(parameters, fd);
+        _ft_quit(parameters, fd);
     else if (command == "MODE")
-        _handler_client_mode(parameters, fd);
+        _ft_mode(parameters, fd);
     else if (command == "KICK")
-        _handler_client_kick(parameters, fd);
+        _ft_kick(parameters, fd);
     else if (command == "TOPIC")
-        _handler_client_topic(parameters, fd);
+        _ft_topic(parameters, fd);
     else if (command == "NICK")
-        _handler_client_nickname(parameters, fd);
+        _ft_nickname(parameters, fd);
     else if (command == "USER")
-        _handler_client_username(parameters, fd);
+        _ft_username(parameters, fd);
     else if (command == "PASS")
-        _handler_client_password(parameters, fd);
+        _ft_password(parameters, fd);
     else if (command == "INVITE")
-        _handler_client_invite(parameters, fd);
+        _ft_invite(parameters, fd);
     else if (command == "PRIVMSG")
-        _handler_client_privmsg(parameters, fd);
+        _ft_privmsg(parameters, fd);
     else
         _send_response(fd, ERR_CMDNOTFOUND(command));
 }
 
-void Server::_execute_command(const std::string buffer, const int fd)
+void Server::_exec_cmd(const std::string buffer, const int fd)
 {
 	if (buffer.empty()) 
 		return;
 
-	std::string clean_buffer = _cleanse_buffer(buffer, CRLF);
+	std::string clean_buffer = _remove_rn(buffer, CRLF);
 	std::vector<std::string> splitted_buffer =
 		_split_commd(buffer, SPACE);
 
@@ -273,7 +258,7 @@ void Server::_execute_command(const std::string buffer, const int fd)
         return ;
     std::string parameters = splitted_buffer[1];
 
-	_handle_command(command, parameters, fd);
+	_handle_commands(command, parameters, fd);
 }
 
 // SERVER METHODS
@@ -495,7 +480,7 @@ void Server::handleClientData(int clientFd)
             if (!completeMessage.empty())
             {
                 // std::cout << "=== COMPLETE MESSAGE RECEIVED ===" << std::endl;
-                _execute_command(completeMessage.c_str(), clientFd);
+                _exec_cmd(completeMessage.c_str(), clientFd);
             }
         }
         

@@ -1,6 +1,6 @@
 CXX = c++
 CXXFLAGS = -std=c++98 -Wall -Wextra -Werror
-SRC = src/main.cpp src/Server.cpp src/Client.cpp src/Channel.cpp \
+SRC = src/main.cpp src/Server.cpp src/Client.cpp src/Channel.cpp src/cmd_utils.cpp \
 	src/commd/Join.cpp src/commd/Invite.cpp src/commd/Mode.cpp \
 	src/commd/Part.cpp src/commd/Privmsg.cpp src/commd/Nick.cpp src/commd/User.cpp \
 	src/commd/Pass.cpp  src/commd/Topic.cpp  \

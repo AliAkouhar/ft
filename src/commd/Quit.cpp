@@ -3,10 +3,9 @@
 #include "../../inc/Client.hpp"
 #include "../../inc/Replies.hpp"
 
-void Server::_handler_client_quit(const std::string& buffer, const int fd) {
-	(void)buffer;
+void Server::_ft_quit(const std::string& buffer, const int fd) {
 	Client* client = _get_client(fd);
-
+	(void)buffer;
 
     for (std::vector<Channel*>::iterator it = _channels.begin();
 		 it != _channels.end();

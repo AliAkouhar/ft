@@ -14,9 +14,9 @@ std::vector<std::string> split_parameters(const std::string& s, const std::strin
 	return tokens;
 }
 
-void Server::_handler_client_privmsg(const std::string& buffer, const int fd) {
-	Client* client = _get_client(fd);
+void Server::_ft_privmsg(const std::string& buffer, const int fd) {
 	std::vector<std::string> params = _split_buffer(buffer, " ");
+	Client* client = _get_client(fd);
 
 	if (!client->get_is_logged()) {
 		_send_response(fd, ERR_NOTREGISTERED(client->get_nickname()));

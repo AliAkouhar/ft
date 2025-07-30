@@ -74,27 +74,32 @@ class Server
 
 	// void _is_valid_port(const std::string& port);
 	// bool _is_client_in_any_channel(const int fd);
-	bool _client_is_ready_to_login(const int fd);
-	bool _is_valid_nickname(const std::string& nickname);
+
+	void _handle_commands(const std::string& command, const std::string& parameters, const int fd);
 	bool _is_nickname_in_use(const int fd, const std::string& nickname);
-	void _handle_command(const std::string& command, const std::string& parameters, const int fd);
-	void _handler_client_join(const std::string& buffer, const int fd);
-	void _handler_client_quit(const std::string& buffer, const int fd);
-	void _handler_client_part(const std::string& buffer, const int fd);
-	void _handler_client_mode(const std::string& buffer, const int fd);
-	void _handler_client_kick(const std::string& buffer, const int fd);
-	void _handler_client_topic(const std::string& buffer, const int fd);
-	void _handler_client_invite(const std::string& buffer, const int fd);
-	void _handler_client_privmsg(const std::string& buffer, const int fd);
-	void _handler_client_nickname(const std::string& nickname, const int fd);
-	void _handler_client_username(const std::string& username, const int fd);
-	void _handler_client_password(const std::string& password, const int fd);
-	void _send_response(const int fd, const std::string& response);
-	void _execute_command(const std::string buffer, const int fd);
+	bool _is_valid_nickname(const std::string& nickname);
+	bool _client_is_ready_to_login(const int fd);
 	void _clear_client(const int fd);
 
+	void _ft_join(const std::string& buffer, const int fd);
+	void _ft_quit(const std::string& buffer, const int fd);
+	void _ft_part(const std::string& buffer, const int fd);
+	void _ft_mode(const std::string& buffer, const int fd);
+	void _ft_kick(const std::string& buffer, const int fd);
+	void _ft_topic(const std::string& buffer, const int fd);
+	void _ft_invite(const std::string& buffer, const int fd);
+	void _ft_privmsg(const std::string& buffer, const int fd);
+	void _ft_nickname(const std::string& nickname, const int fd);
+	void _ft_username(const std::string& username, const int fd);
+	void _ft_password(const std::string& password, const int fd);
+	void _send_response(const int fd, const std::string& response);
+	void _exec_cmd(const std::string buffer, const int fd);
 
-	std::string _cleanse_buffer(const std::string& buffer,
+	int _user_checks(Client *client);
+	void _part_cont(std::string& channel_name, Client* client, const int fd);
+	int _nickname_checks(const std::string& nickname, Client* client, const int fd);
+	int _join_checks(Client *client, const int fd, const std::vector<std::string>& params);
+	std::string _remove_rn(const std::string& buffer,
 								const std::string& chars_to_remove);
 	std::vector<std::string> _split_buffer(const std::string& buffer,
 										   const std::string& delimiter);

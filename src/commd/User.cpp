@@ -3,7 +3,7 @@
 #include "../../inc/Client.hpp"
 #include "../../inc/Replies.hpp"
 
-void Server::_handler_client_username(const std::string& buffer, const int fd)
+void Server::_ft_username(const std::string& buffer, const int fd)
 {
 	Client* client = _get_client(fd);
 
@@ -13,21 +13,9 @@ void Server::_handler_client_username(const std::string& buffer, const int fd)
 		_reply_code = 461;
 		return ;
 	}
-
-	if (!client || !client->get_is_authenticated())
-	{
-		_send_response(fd, ERR_NOTREGISTERED(std::string("*")));
-		_reply_code = 451;
-		return 
-	}
+	else if (_user_checks(client))
+		return;
 	
-	if (!client->get_already_registered())
-	{
-		_send_response(fd, ERR_ALREADYREGISTERED(client->get_nickname()));
-		_reply_code = 462;
-		return ;
-	}
-
 	client->set_username(buffer);
 	if (_client_is_ready_to_login(fd))
 	{
@@ -39,7 +27,5 @@ void Server::_handler_client_username(const std::string& buffer, const int fd)
 		_reply_code = 001;
 	}
 	else
-	{
 		_reply_code = 200;
-	}
 }

@@ -3,28 +3,13 @@
 #include "../../inc/Client.hpp"
 #include "../../inc/Replies.hpp"
 
-void Server::_handler_client_join(const std::string& buffer, const int fd) {
+void Server::_ft_join(const std::string& buffer, const int fd) {
 	std::vector<std::string> params = _split_buffer(buffer, SPACE);
+	std::string channel_name = params[0];
 	Client* client = _get_client(fd);
 
-	if (params.empty()) {
-		_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
-		_reply_code = 461;
-		return;
-	}
-
-	if (!client->get_is_logged()) {
-		_send_response(fd, ERR_NOTREGISTERED(client->get_nickname()));
-		_reply_code = 451;
-		return;
-	}
-
-	std::string channel_name = params[0];
-
-	if (channel_name.empty() || channel_name[0] != '#') {
-		_send_response(fd, ERR_BADCHANMASK(_get_hostname(), client->get_nickname(), channel_name));
-		_reply_code = 403;
-		return;
+	if (_join_checks(client, fd, params)) {
+		return ;	
 	}
 
 	Channel* channel = _get_channel(channel_name);

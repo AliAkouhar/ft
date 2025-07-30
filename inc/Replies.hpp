@@ -1,6 +1,5 @@
 #ifndef REPLIES_HPP
 #define REPLIES_HPP
-
 #define CRLF "\r\n"
 
 // refer to https://datatracker.ietf.org/doc/html/rfc1459

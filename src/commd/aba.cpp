@@ -1,81 +1,72 @@
+#include "../../inc/Server.hpp"
+#include "../../inc/Channel.hpp"
+#include "../../inc/Client.hpp"
+#include "../../inc/Replies.hpp"
 
-void Server::_handler_client_privmsg(const std::string& buffer, const int fd)
+std::vector<std::string> _split_string(const std::string& s, char delimiter) { // add this function to  a shared file
+    std::vector<std::string> tokens;
+    size_t start = 0;
+    size_t end = s.find(delimiter);
+
+    while (end != std::string::npos) {
+        tokens.push_back(s.substr(start, end - start));
+        start = end + 1;
+        end = s.find(delimiter, start);
+    }
+    tokens.push_back(s.substr(start, std::string::npos));
+    return tokens;
+}
+
+void Server::_part_cont(const std::string& buffer, Client* client, const int fd)
+{
+    std::string nickname = client->get_nickname();
+
+    std::vector<std::string> channels = _split_string(buffer, ',');
+    
+    for (size_t i = 0; i < channels.size(); ++i) {
+        std::string& channel_name = channels[i];
+                    
+        Channel* channel = _get_channel(channel_name);
+        if (!channel)
+        {
+            _send_response(fd, ERR_NOSUCHCHANNEL(channel_name));
+            _reply_code = 403;
+        }
+        else if (!channel->has_client(client))
+        {
+            _send_response(fd, ERR_NOTONCHANNEL(channel_name));
+            _reply_code = 442;
+        }
+        else
+        {
+            channel->part(client);
+            _send_response(fd,
+                RPL_PART(client->get_hostname(),
+                channel_name,
+                nickname));
+                _reply_code = 200;
+        }
+    }
+}
+
+void Server::_handler_client_part(const std::string& buffer, const int fd)
 {
 	Client* client = _get_client(fd);
+    std::string nickname = client->get_nickname();
+    std::vector<std::string> param = _split_buffer(buffer, SPACE);
 
-	std::vector<std::string> params = _split_buffer(buffer, " ");
-
-	if (client->get_is_logged())
-	{
-		if (params.size() < 2)
-		{
-			_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
-			_reply_code = 461;
-			return;
-		}
-
-		std::vector<std::string> receivers = split_parameters(params[0], ",");
-
-		for (std::vector<std::string>::iterator it = receivers.begin();
-			 it != receivers.end();
-			 ++it)
-		{
-			if ((*it)[0] == '#')
-			{
-				Channel* target_channel = this->_get_channel(*it);
-				if (!target_channel)
-				{
-					_send_response(fd, ERR_NOSUCHCHANNEL(*it));
-					_reply_code = 403;
-					return;
-				}
-
-				if (!target_channel->has_client(client))
-				{
-					_send_response(fd,
-								   ERR_NOTONCHANNEL(client->get_nickname()));
-					_reply_code = 442;
-					return;
-				}
-			}
-			else
-			{
-				Client* target_client = this->_get_client(*it);
-				if (!target_client)
-				{
-					_send_response(fd,
-								   ERR_NOSUCHNICK(std::string(""),
-												  client->get_nickname()));
-					_reply_code = 401;
-					return;
-				}
-			}
-		}
-
-		for (std::vector<std::string>::iterator it = receivers.begin();
-			 it != receivers.end();
-			 ++it)
-		{
-			if ((*it)[0] == '#')
-			{
-				Channel* target_channel = this->_get_channel(*it);
-				target_channel->broadcast(
-					client, target_channel->get_name(), params[1]);
-			}
-			else
-			{
-				Client* target_client = this->_get_client(*it);
-				_send_response(target_client->get_fd(),
-							   RPL_PRIVMSG(client->get_nickname(),
-										   client->get_hostname(),
-										   target_client->get_nickname(),
-										   params[1]));
-			}
-		}
-	}
-	else
-	{
-		_send_response(fd, ERR_NOTREGISTERED(client->get_nickname()));
-		_reply_code = 451;
-	}
+    if (buffer.empty())
+    {
+        _send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
+        _reply_code = 461;
+        return ;
+    }
+    
+    if (!client->get_is_logged())
+    {
+        _send_response(fd, ERR_USERNOTINCHANNEL(nickname, param[0]));
+        _reply_code = 451;
+        return 
+    }
+    _part_cont(param[0], client, fd);
 }

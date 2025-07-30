@@ -15,10 +15,9 @@ void _set_channel_operator_mode(Channel* channel, Client* client, bool addMode);
 void _set_channel_limit_mode(Channel* channel, const std::string& limitStr,
 							 bool addMode);
 
-void Server::_handler_client_mode(const std::string& buffer, const int fd)
-{
+void Server::_ft_mode(const std::string& buffer, const int fd) {
+	std::string channelName, modeFlags, argument;
 	std::istringstream iss(buffer);
-	std::string channelName, modeFlags, argument;\
 
 	iss >> channelName >> modeFlags;
 	if (iss >> argument)
