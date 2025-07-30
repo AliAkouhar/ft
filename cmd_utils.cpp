@@ -1,4 +1,4 @@
-#include "../inc/Server.hpp"
+#include "inc/Server.hpp"
 
 int Server::_join_checks(Client *client, const int fd, const std::vector<std::string>& params) {
 	std::string channel_name = params[0];
@@ -96,4 +96,116 @@ int Server::_user_checks(Client* client)
 		return 1;
 	}
 	return 0;
+}
+
+int Server::_invite_checks(Client* inviter, const int fd, std::vector<std::string>& params) {
+
+	if (params.size() < 2) {
+		_send_response(fd, ERR_NEEDMOREPARAMS(inviter->get_nickname()));
+		_reply_code = 461;
+		return 1;
+	}
+
+	if (!inviter->get_is_logged()) {
+		_send_response(fd, ERR_NOTREGISTERED(inviter->get_nickname()));
+		_reply_code = 451;
+		return 1;
+	}
+
+	std::string target_nick = params[0];
+	std::string channel_name = params[1];
+
+	Client* invitee = _get_client(target_nick);
+	Channel* channel = _get_channel(channel_name);
+
+	if (!invitee) {
+		_send_response(fd, ERR_NOSUCHNICK(inviter->get_nickname(), target_nick));
+		_reply_code = 401;
+		return 1;
+	}
+
+	if (!channel) {
+		_send_response(fd, ERR_NOSUCHCHANNEL(channel_name));
+		_reply_code = 403;
+		return 1;
+	}
+
+	if (!channel->has_client(inviter)) {
+		_send_response(fd, ERR_NOTONCHANNEL(channel_name));
+		_reply_code = 442;
+		return 1;
+	}
+
+	if (channel->has_client(invitee)) {
+		_send_response(fd, ERR_USERONCHANNEL(invitee->get_nickname(), channel_name));
+		_reply_code = 443;
+		return 1;
+	}
+	return 0;
+}
+
+int Server::_kick_checks(Client* kicker, const int fd, const std::string& channel_name) {
+	if (params.size() < 2)
+	{
+		_send_response(fd, ERR_NEEDMOREPARAMS(kicker->get_nickname()));
+		_reply_code = 461;
+		return 1;
+	}
+
+	if (!kicker->get_is_logged())
+	{
+		_send_response(fd, ERR_NOTREGISTERED(kicker->get_nickname()));
+		_reply_code = 451;
+		return 1;
+	}
+	Channel* channel = _get_channel(channel_name);
+	if (!channel)
+	{
+		_send_response(fd, ERR_NOSUCHCHANNEL(channel_name));
+		_reply_code = 403;
+		return 1;
+	}
+
+	if (!channel->has_client(kicker))
+	{
+		_send_response(fd, ERR_NOTONCHANNEL(channel_name));
+		_reply_code = 442;
+		return 1;
+	}
+
+	if (!channel->is_channel_operator(kicker->get_nickname()))
+	{
+		_send_response(fd, ERR_CHANOPRIVSNEEDED(channel_name));
+		_reply_code = 482;
+		return 1;
+	}
+	return 0;
+}
+
+int Server::_topic_checks(Client* client, const int fd, const std::string& channel_name) {
+	if (params.size() < 1) {
+		_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
+		_reply_code = 461;
+		return;
+	}
+
+	if (!client->get_is_logged()) {
+		_send_response(fd, ERR_NOTREGISTERED(client->get_nickname()));
+		_reply_code = 451;
+		return;
+	}
+
+	Channel* channel = _get_channel(channel_name);
+
+	if (!channel) {
+		_send_response(fd, ERR_NOSUCHCHANNEL(channel_name));
+		_reply_code = 403;
+		return;
+	}
+
+	if (!channel->is_client_in_channel(client->get_nickname())) {
+		_send_response(fd, ERR_NOTONCHANNEL(channel_name));
+		_reply_code = 442;
+		return;
+	}
 }

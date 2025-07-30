@@ -24,7 +24,7 @@ void Server::_ft_part(const std::string& buffer, const int fd) {
     }
 
     _part_cont(channel_name, client, fd);
-
+}
 
     // {
 
@@ -49,4 +49,3 @@ void Server::_ft_part(const std::string& buffer, const int fd) {
 	// 		_reply_code = 200;
 	// 	}
 	// }
-}

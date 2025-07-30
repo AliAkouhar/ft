@@ -99,6 +99,10 @@ class Server
 	void _part_cont(std::string& channel_name, Client* client, const int fd);
 	int _nickname_checks(const std::string& nickname, Client* client, const int fd);
 	int _join_checks(Client *client, const int fd, const std::vector<std::string>& params);
+	int _invite_checks(Client* inviter, const int fd, std::vector<std::string>& params);
+	int _kick_checks(Client* kicker, const int fd, const std::string& channel_name);
+	int _topic_checks(Client* client, const int fd, const std::string& channel_name);
+
 	std::string _remove_rn(const std::string& buffer,
 								const std::string& chars_to_remove);
 	std::vector<std::string> _split_buffer(const std::string& buffer,
@@ -115,6 +119,18 @@ class Server
 	void _remove_client_from_server(const int fd);
 };
 
+bool _process_mode_flags(const std::string& modeFlags, Channel* channel,
+						 Client* targetClient, const std::string& argument);
+bool _apply_mode_flag(Channel* channel, Client* targetClient, char mode,
+					  bool addMode, const std::string& argument);
+void _set_invite_only_mode(Channel* channel, bool addMode);
+void _set_topic_restriction_mode(Channel* channel, bool addMode);
+void _set_channel_key_mode(Channel* channel, const std::string& key,
+						   bool addMode);
+void _set_channel_operator_mode(Channel* channel, Client* client, bool addMode);
+void _set_channel_limit_mode(Channel* channel, const std::string& limitStr,
+							 bool addMode);
+							
 std::string toupper(const std::string& str);
 
 #endif

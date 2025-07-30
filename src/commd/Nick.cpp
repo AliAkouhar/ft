@@ -3,7 +3,6 @@
 #include "../../inc/Client.hpp"
 #include "../../inc/Replies.hpp"
 
-
 void Server::_ft_nickname(const std::string& buffer, const int fd) {
     Client* client = _get_client(fd);
 
