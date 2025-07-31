@@ -1,5 +1,39 @@
 #include "inc/Server.hpp"
 
+void Server::_mode_checks(Client* client, const int fd, const std::string& channelName,
+						const std::string& modeFlags, const std::string& argument)
+{
+	if (modeFlags.empty())
+	{
+		_reply_code = 461;
+		return 1;
+	}
+
+	Client* client = _get_client(fd);
+	if (channelName.empty() || modeFlags.empty())
+	{
+		_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
+		_reply_code = 461;
+		return 1;
+	}
+
+	Channel* channel = _get_channel(channelName);
+	if (!channel)
+	{
+		_send_response(fd, ERR_NOSUCHCHANNEL(channelName));
+		_reply_code = 403;
+		return 1;
+	}
+
+	if (!channel->is_channel_operator(client->get_nickname()))
+	{
+		_send_response(fd, ERR_CHANOPRIVSNEEDED(channelName));
+		_reply_code = 482;
+		return 1;
+	}
+	return 0;
+}
+
 int Server::_join_checks(Client *client, const int fd, const std::vector<std::string>& params) {
 	std::string channel_name = params[0];
 	if (params.empty()) {

@@ -11,35 +11,11 @@ void Server::_ft_mode(const std::string& buffer, const int fd) {
 	if (iss >> argument)
 		iss >> argument;
 
-	if (modeFlags.empty())
-	{
-		_reply_code = 461;
-		return;
-	}
-
 	Client* client = _get_client(fd);
-	if (channelName.empty() || modeFlags.empty())
-	{
-		_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
-		_reply_code = 461;
+	if (_mode_checks(client, fd, channelName, modeFlags, argument))
 		return ;
-	}
-
+	
 	Channel* channel = _get_channel(channelName);
-	if (!channel)
-	{
-		_send_response(fd, ERR_NOSUCHCHANNEL(channelName));
-		_reply_code = 403;
-		return ;
-	}
-
-	if (!channel->is_channel_operator(client->get_nickname()))
-	{
-		_send_response(fd, ERR_CHANOPRIVSNEEDED(channelName));
-		_reply_code = 482;
-		return ;
-	}
-
 	if (!_process_mode_flags(
 				 modeFlags, channel, _get_client(argument), argument))
 	{
@@ -60,3 +36,32 @@ void Server::_ft_mode(const std::string& buffer, const int fd) {
 								argument));
 	_reply_code = 200;
 }
+
+// if (modeFlags.empty())
+	// {
+	// 	_reply_code = 461;
+	// 	return;
+	// }
+
+	// Client* client = _get_client(fd);
+	// if (channelName.empty() || modeFlags.empty())
+	// {
+	// 	_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
+	// 	_reply_code = 461;
+	// 	return ;
+	// }
+
+	// Channel* channel = _get_channel(channelName);
+	// if (!channel)
+	// {
+	// 	_send_response(fd, ERR_NOSUCHCHANNEL(channelName));
+	// 	_reply_code = 403;
+	// 	return ;
+	// }
+
+	// if (!channel->is_channel_operator(client->get_nickname()))
+	// {
+	// 	_send_response(fd, ERR_CHANOPRIVSNEEDED(channelName));
+	// 	_reply_code = 482;
+	// 	return ;
+	// }

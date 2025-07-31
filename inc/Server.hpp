@@ -102,6 +102,8 @@ class Server
 	int _invite_checks(Client* inviter, const int fd, std::vector<std::string>& params);
 	int _kick_checks(Client* kicker, const int fd, const std::string& channel_name);
 	int _topic_checks(Client* client, const int fd, const std::string& channel_name);
+	int _mode_checks(Client* client, const int fd, const std::string& channel_name,
+						const std::string& modeFlags, const std::string& argument);
 
 	std::string _remove_rn(const std::string& buffer,
 								const std::string& chars_to_remove);
