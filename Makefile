@@ -14,7 +14,7 @@ SRC = src/main.cpp \
       src/commd/Part.cpp \
       src/commd/Privmsg.cpp \
       src/commd/Nick.cpp \
-      src/cmd_utils.cpp \
+      src/RFC_Checks.cpp \
       src/commd/User.cpp \
       src/commd/Pass.cpp \
       src/commd/Topic.cpp \

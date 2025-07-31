@@ -104,7 +104,9 @@ class Server
 	int _topic_checks(Client* client, const int fd, const std::string& channel_name, std::vector<std::string>& params);
 	int _mode_checks(Client* client, const int fd, const std::string& channel_name,
 						const std::string& modeFlags);
+	int _privmsg_checks(Client* client, std::vector<std::string> receivers);					
 
+				
 	std::string _remove_rn(const std::string& buffer,
 								const std::string& chars_to_remove);
 	std::vector<std::string> _split_buffer(const std::string& buffer,

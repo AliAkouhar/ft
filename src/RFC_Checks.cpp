@@ -243,3 +243,47 @@ int Server::_topic_checks(Client* client, const int fd, const std::string& chann
 	}
 	return 0;
 }
+
+int Server::_privmsg_checks(Client* client, std::vector<std::string> receivers)
+{
+	if (!client->get_is_logged()) {
+		_send_response(fd, ERR_NOTREGISTERED(client->get_nickname()));
+		_reply_code = 451;
+		return 1;
+	}
+
+	if (params.size() < 2) {
+		_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
+		_reply_code = 461;
+		return 1;
+	}
+
+	for (std::vector<std::string>::iterator it = receivers.begin(); it != receivers.end(); ++it) {
+		const std::string& target = *it;
+
+		if (target[0] == '#') {
+			Channel* channel = _get_channel(target);
+			if (!channel) {
+				_send_response(fd, ERR_NOSUCHCHANNEL(target));
+				_reply_code = 403;
+				return 1;
+			}
+			if (!channel->has_client(client)) {
+				_send_response(fd, ERR_NOTONCHANNEL(client->get_nickname()));
+				_reply_code = 442;
+				return 1;
+			}
+		}
+		else
+		{
+			Client* target_client = _get_client(target);
+			if (!target_client) {
+				_send_response(fd, ERR_NOSUCHNICK(std::string(""),
+												  client->get_nickname()));
+				_reply_code = 401;
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
