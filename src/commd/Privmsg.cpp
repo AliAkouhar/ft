@@ -18,8 +18,14 @@ void Server::_ft_privmsg(const std::string& buffer, const int fd) {
 	std::vector<std::string> params = _split_buffer(buffer, " ");
 	Client* client = _get_client(fd);
 	
+	if (params.size() < 2) {
+		_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
+		_reply_code = 461;
+		return ;
+	}
+
 	std::vector<std::string> receivers = split_parameters(params[0], ",");
-	if (_privmsg_checks(client, receivers))
+	if (_privmsg_checks(client, fd, receivers))
 	{
 		return ;
 	}

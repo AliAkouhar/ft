@@ -5,28 +5,28 @@
 
 void Server::_ft_invite(const std::string& buffer, const int fd) {
 	std::vector<std::string> params = _split_buffer(buffer, SPACE);
-	Client* inviter = _get_client(fd);
+	Client* client = _get_client(fd);
 
-	if (_invite_checks(inviter, fd, params)) {
+	if (_invite_checks(client, fd, params)) {
 		return;
 	}
 
 	std::string target_nick = params[0];
-	std::string channel_name = params[1];
+	std::string target_channel = params[1];
 	
 	Client* invitee = _get_client(target_nick);
 
-	invitee->add_channel_invited(channel_name);
+	invitee->add_channel_invited(target_channel);
 
-	_send_response(fd, RPL_INVITING(inviter->get_hostname(),
-										channel_name,
-										inviter->get_nickname(),
+	_send_response(fd, RPL_INVITING(client->get_hostname(),
+										target_channel,
+										client->get_nickname(),
 										target_nick));
 			_reply_code = 200;
 }
 
 
-	// if (!inviter->get_is_logged()) {
+	// if (!client->get_is_logged()) {
 	// 	_send_response(fd, ERR_NOTREGISTERED(inviter->get_nickname()));
 	// 	_reply_code = 451;
 	// 	return;
