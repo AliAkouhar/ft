@@ -95,15 +95,15 @@ class Server
 	void _send_response(const int fd, const std::string& response);
 	void _exec_cmd(const std::string buffer, const int fd);
 
-	int _user_checks(Client *client);
+	int _user_checks(Client *client, const int fd);
 	void _part_cont(std::string& channel_name, Client* client, const int fd);
 	int _nickname_checks(const std::string& nickname, Client* client, const int fd);
 	int _join_checks(Client *client, const int fd, const std::vector<std::string>& params);
 	int _invite_checks(Client* inviter, const int fd, std::vector<std::string>& params);
-	int _kick_checks(Client* kicker, const int fd, const std::string& channel_name);
-	int _topic_checks(Client* client, const int fd, const std::string& channel_name);
+	int _kick_checks(Client* kicker, Channel* channel, const int fd, const std::string& channel_name, std::vector<std::string> params);
+	int _topic_checks(Client* client, const int fd, const std::string& channel_name, std::vector<std::string>& params);
 	int _mode_checks(Client* client, const int fd, const std::string& channel_name,
-						const std::string& modeFlags, const std::string& argument);
+						const std::string& modeFlags);
 
 	std::string _remove_rn(const std::string& buffer,
 								const std::string& chars_to_remove);

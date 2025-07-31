@@ -13,7 +13,7 @@ void Server::_ft_username(const std::string& buffer, const int fd)
 		_reply_code = 461;
 		return ;
 	}
-	else if (_user_checks(client))
+	else if (_user_checks(client, fd))
 		return;
 	
 	client->set_username(buffer);

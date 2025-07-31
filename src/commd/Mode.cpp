@@ -12,7 +12,7 @@ void Server::_ft_mode(const std::string& buffer, const int fd) {
 		iss >> argument;
 
 	Client* client = _get_client(fd);
-	if (_mode_checks(client, fd, channelName, modeFlags, argument))
+	if (_mode_checks(client, fd, channelName, modeFlags))
 		return ;
 	
 	Channel* channel = _get_channel(channelName);

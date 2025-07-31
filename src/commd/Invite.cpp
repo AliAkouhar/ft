@@ -7,7 +7,7 @@ void Server::_ft_invite(const std::string& buffer, const int fd) {
 	std::vector<std::string> params = _split_buffer(buffer, SPACE);
 	Client* inviter = _get_client(fd);
 
-	if (_ivnvite_checks(inviter, fd, params)) {
+	if (_invite_checks(inviter, fd, params)) {
 		return;
 	}
 

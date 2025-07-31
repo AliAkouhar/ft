@@ -11,13 +11,14 @@ void Server::_ft_kick(const std::string& buffer, const int fd) {
 	std::string channel_name = params[0];
 
 	Client* kicker = _get_client(fd);
-	if (_kick_checks(kicker, fd, channel_name))
+	Channel* channel = _get_channel(channel_name);
+	if (_kick_checks(kicker, channel, fd, channel_name, params))
 	{
 		return;
 	}
 	
 	std::vector<std::string> comments = _split_buffer(params[1], SPACE);
-
+	
 	std::string target_nickname = comments[0];
 	Client* target = _get_client(target_nickname);
 	if (!target || !channel->has_client(target))

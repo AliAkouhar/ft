@@ -14,7 +14,7 @@ void Server::_ft_topic(const std::string& buffer, const int fd) {
 	Client* client = _get_client(fd);
 
 	Channel* channel = _get_channel(channel_name);
-	if (_topic_checks(client, fd, channel_name)) {
+	if (_topic_checks(client, fd, channel_name, params)) {
 		return;
 	}
 

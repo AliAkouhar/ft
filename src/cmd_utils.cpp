@@ -1,7 +1,7 @@
-#include "inc/Server.hpp"
+#include "../inc/Server.hpp"
 
-void Server::_mode_checks(Client* client, const int fd, const std::string& channelName,
-						const std::string& modeFlags, const std::string& argument)
+int Server::_mode_checks(Client* client, const int fd, const std::string& channelName,
+						const std::string& modeFlags)
 {
 	if (modeFlags.empty())
 	{
@@ -9,7 +9,6 @@ void Server::_mode_checks(Client* client, const int fd, const std::string& chann
 		return 1;
 	}
 
-	Client* client = _get_client(fd);
 	if (channelName.empty() || modeFlags.empty())
 	{
 		_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
@@ -39,20 +38,21 @@ int Server::_join_checks(Client *client, const int fd, const std::vector<std::st
 	if (params.empty()) {
 		_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
 		_reply_code = 461;
-		return;
+		return 1;
 	}
 
 	if (!client->get_is_logged()) {
 		_send_response(fd, ERR_NOTREGISTERED(client->get_nickname()));
 		_reply_code = 451;
-		return;
+		return 1;
 	}
 
 	if (channel_name.empty() || channel_name[0] != '#') {
 		_send_response(fd, ERR_BADCHANMASK(_get_hostname(), client->get_nickname(), channel_name));
 		_reply_code = 403;
-		return;
+		return 1;
 	}
+	return 0;
 }
 
 int Server::_nickname_checks(const std::string& buffer, Client* client, const int fd)
@@ -114,7 +114,7 @@ void Server::_part_cont(std::string& channel_name, Client* client, const int fd)
     _reply_code = 200;
 }
 
-int Server::_user_checks(Client* client)
+int Server::_user_checks(Client* client, const int fd)
 {
 	if (!client || !client->get_is_authenticated())
 	{
@@ -178,7 +178,7 @@ int Server::_invite_checks(Client* inviter, const int fd, std::vector<std::strin
 	return 0;
 }
 
-int Server::_kick_checks(Client* kicker, const int fd, const std::string& channel_name) {
+int Server::_kick_checks(Client* kicker, Channel* channel, const int fd, const std::string& channel_name, std::vector<std::string> params) {
 	if (params.size() < 2)
 	{
 		_send_response(fd, ERR_NEEDMOREPARAMS(kicker->get_nickname()));
@@ -192,7 +192,6 @@ int Server::_kick_checks(Client* kicker, const int fd, const std::string& channe
 		_reply_code = 451;
 		return 1;
 	}
-	Channel* channel = _get_channel(channel_name);
 	if (!channel)
 	{
 		_send_response(fd, ERR_NOSUCHCHANNEL(channel_name));
@@ -216,17 +215,17 @@ int Server::_kick_checks(Client* kicker, const int fd, const std::string& channe
 	return 0;
 }
 
-int Server::_topic_checks(Client* client, const int fd, const std::string& channel_name) {
+int Server::_topic_checks(Client* client, const int fd, const std::string& channel_name, std::vector<std::string>& params) {
 	if (params.size() < 1) {
 		_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
 		_reply_code = 461;
-		return;
+		return 1;
 	}
 
 	if (!client->get_is_logged()) {
 		_send_response(fd, ERR_NOTREGISTERED(client->get_nickname()));
 		_reply_code = 451;
-		return;
+		return 1;
 	}
 
 	Channel* channel = _get_channel(channel_name);
@@ -234,12 +233,13 @@ int Server::_topic_checks(Client* client, const int fd, const std::string& chann
 	if (!channel) {
 		_send_response(fd, ERR_NOSUCHCHANNEL(channel_name));
 		_reply_code = 403;
-		return;
+		return 1;
 	}
 
 	if (!channel->is_client_in_channel(client->get_nickname())) {
 		_send_response(fd, ERR_NOTONCHANNEL(channel_name));
 		_reply_code = 442;
-		return;
+		return 1;
 	}
+	return 0;
 }
