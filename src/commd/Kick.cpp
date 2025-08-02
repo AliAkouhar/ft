@@ -27,62 +27,18 @@ void Server::_ft_kick(const std::string& buffer, const int fd) {
 		_reply_code = 441;
 		return;
 	}
+	std::string reason = (comments.size() > 1) ? comments[1] : std::string("");
+	std::string kick_msg = RPL_KICK(
+			kicker->get_hostname(),
+			channel_name,
+			kicker->get_nickname(),
+			target->get_nickname(),
+			reason
+	);
 
-	if (params.size() > 2)
-	{
-		_send_response(fd,
-					   RPL_KICK(kicker->get_hostname(),
-								channel_name,
-								kicker->get_nickname(),
-								target->get_nickname(),
-								comments[1]));
-	}
-	else
-	{
-		_send_response(fd,
-					   RPL_KICK(kicker->get_hostname(),
-								channel_name,
-								kicker->get_nickname(),
-								target->get_nickname(),
-								""));
-	}
+	channel->broadcast(kicker, channel_name, kick_msg);
+	_send_response(target->get_fd(), kick_msg);
+
 	channel->kick(target);
 	_reply_code = 200;
 }
-
-// if (!kicker->get_is_logged())
-	// {
-	// 	_send_response(fd, ERR_NOTREGISTERED(kicker->get_nickname()));
-	// 	_reply_code = 451;
-	// 	return;
-	// }
-
-	// if (params.size() < 2)
-	// {
-	// 	_send_response(fd, ERR_NEEDMOREPARAMS(kicker->get_nickname()));
-	// 	_reply_code = 461;
-	// 	return;
-	// }
-
-
-	// Channel* channel = _get_channel(channel_name);
-	// if (!channel)
-	// {
-	// 	_send_response(fd, ERR_NOSUCHCHANNEL(channel_name));
-	// 	_reply_code = 403;
-	// 	return;
-	// }
-
-	// if (!channel->has_client(kicker))
-	// {
-	// 	_send_response(fd, ERR_NOTONCHANNEL(channel_name));
-	// 	_reply_code = 442;
-	// 	return;
-	// }
-
-	// if (!channel->is_channel_operator(kicker->get_nickname()))
-	// {
-	// 	_send_response(fd, ERR_CHANOPRIVSNEEDED(channel_name));
-	// 	_reply_code = 482;
-	// 	return;
-	// }

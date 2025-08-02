@@ -132,16 +132,15 @@ int Server::_user_checks(Client* client, const int fd)
 	return 0;
 }
 
-int Server::_invite_checks(Client* inviter, const int fd, std::vector<std::string>& params) {
+int Server::_invite_checks(Client* client,  Client* invitee, const int fd, std::vector<std::string>& params) {
 
 	if (params.size() < 2) {
-		_send_response(fd, ERR_NEEDMOREPARAMS(inviter->get_nickname()));
+		_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
 		_reply_code = 461;
 		return 1;
 	}
-
-	if (!inviter->get_is_logged()) {
-		_send_response(fd, ERR_NOTREGISTERED(inviter->get_nickname()));
+	if (!client->get_is_logged()) {
+		_send_response(fd, ERR_NOTREGISTERED(client->get_nickname()));
 		_reply_code = 451;
 		return 1;
 	}
@@ -149,35 +148,35 @@ int Server::_invite_checks(Client* inviter, const int fd, std::vector<std::strin
 	std::string target_nick = params[0];
 	std::string target_channel = params[1];
 
-	Client* invitee = _get_client(target_nick);
 	Channel* channel = _get_channel(target_channel);
 
-	if (!invitee) {
-		_send_response(fd, ERR_NOSUCHNICK(inviter->get_nickname(), target_nick));
-		_reply_code = 401;
-		return 1;
-	}
-
-	if (!channel) {
+	if (!channel)
+	{
 		_send_response(fd, ERR_NOSUCHCHANNEL(target_channel));
 		_reply_code = 403;
-		return 1;
 	}
-
-	if (!channel->has_client(inviter)) {
+	if (!channel->has_client(client))
+	{
 		_send_response(fd, ERR_NOTONCHANNEL(target_channel));
 		_reply_code = 442;
 		return 1;
 	}
-	
 	if (!channel->is_channel_operator(client->get_nickname()))
 	{
 		_send_response(fd, ERR_NOPRIVILEGES(client->get_nickname()));
 		_reply_code = 481;
+		return 1;
 	}
-
-	if (channel->has_client(invitee)) {
-		_send_response(fd, ERR_USERONCHANNEL(invitee->get_nickname(), target_channel));
+	if (!invitee)
+	{
+		_send_response(fd, ERR_NOSUCHNICK(target_channel, target_nick));
+		_reply_code = 401;
+		return 1;
+	}
+	if (channel->has_client(invitee))
+	{
+		_send_response(fd,
+						ERR_USERONCHANNEL(target_nick, target_channel));
 		_reply_code = 443;
 		return 1;
 	}

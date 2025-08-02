@@ -3,6 +3,12 @@
 #include "../../inc/Client.hpp"
 #include "../../inc/Replies.hpp"
 
+
+/*
+ * Parameters: <channel> {[+|-]|o|p|s|i|t|n|b|v} [<limit>] [<user>]
+ * Reference: https://datatracker.ietf.org/doc/html/rfc1459#section-4.2.3
+ */
+
 void Server::_ft_mode(const std::string& buffer, const int fd) {
 	std::string channelName, modeFlags, argument;
 	std::istringstream iss(buffer);
@@ -36,32 +42,3 @@ void Server::_ft_mode(const std::string& buffer, const int fd) {
 								argument));
 	_reply_code = 200;
 }
-
-// if (modeFlags.empty())
-	// {
-	// 	_reply_code = 461;
-	// 	return;
-	// }
-
-	// Client* client = _get_client(fd);
-	// if (channelName.empty() || modeFlags.empty())
-	// {
-	// 	_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
-	// 	_reply_code = 461;
-	// 	return ;
-	// }
-
-	// Channel* channel = _get_channel(channelName);
-	// if (!channel)
-	// {
-	// 	_send_response(fd, ERR_NOSUCHCHANNEL(channelName));
-	// 	_reply_code = 403;
-	// 	return ;
-	// }
-
-	// if (!channel->is_channel_operator(client->get_nickname()))
-	// {
-	// 	_send_response(fd, ERR_CHANOPRIVSNEEDED(channelName));
-	// 	_reply_code = 482;
-	// 	return ;
-	// }

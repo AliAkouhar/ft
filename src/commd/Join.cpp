@@ -3,6 +3,12 @@
 #include "../../inc/Client.hpp"
 #include "../../inc/Replies.hpp"
 
+
+/*
+ * Parameters: <channel>{,<channel>} [<key>{,<key>}]
+ * Link: https://datatracker.ietf.org/doc/html/rfc1459#section-4.2.1
+ */
+
 void Server::_ft_join(const std::string& buffer, const int fd) {
 	std::vector<std::string> params = _split_buffer(buffer, SPACE);
 	std::string channel_name = params[0];

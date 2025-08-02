@@ -24,7 +24,6 @@ Server::~Server()
 	}
 	_channels.clear();
 }
-//ALI
 
 void Server::_remove_client_from_server(const int fd)
 {
@@ -70,7 +69,7 @@ void Server::_remove_client_fd(const int fd)
 void Server::_clear_client(const int fd)
 {
 	_remove_client_from_channels(fd);
-	// _remove_client_from_server(fd);
+	/* _remove_client_from_server(fd); */
 	_remove_client_fd(fd);
 }
 
@@ -211,8 +210,6 @@ std::vector<std::string> Server::_split_buffer(const std::string& buffer,
 	return tokens;
 }
 
-// Ctrl+V, then Ctrl+M for \r, and Ctrl+V, Ctrl+J for \n
-
 void Server::_handle_commands(const std::string& command, const std::string& parameters, const int fd)
 {
     if (command == "PART")
@@ -261,15 +258,13 @@ void Server::_exec_cmd(const std::string buffer, const int fd)
 	_handle_commands(command, parameters, fd);
 }
 
-// SERVER METHODS
-
 void Server::_add_channel(Channel* channel) { _channels.push_back(channel); }
 
 Server::Server() : _port(7071), _server_fdsocket(-1){}
 
 Server::Server(char **av)
 {
-    _fds.resize(MAX_EVENTS); // Initialize the epoll events vector
+    _fds.resize(MAX_EVENTS);
     _port = atoi(av[1]);
     _pass = av[2];
     _ip = "127.0.0.1";

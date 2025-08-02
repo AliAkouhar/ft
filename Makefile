@@ -22,7 +22,6 @@ SRC = src/main.cpp \
       src/commd/Quit.cpp \
       src/commd/mode_utils.cpp
 
-# Convert src paths to obj paths
 OBJ = $(SRC:src/%.cpp=$(OBJ_DIR)/%.o)
 
 all: $(NAME)

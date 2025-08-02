@@ -39,4 +39,36 @@
 
 /quit :Goodbye message
 
+// Ctrl+V, then Ctrl+M for \r, Enter for \n
 
+#############Printf and NC commands#####################################
+
+printf "PASS pass\r\nNICK user1\r\nUSER user1 0 * :Normal User\r\n" | nc localhost 1337 
+
+###TOPIC
+printf "PASS pass\r\nNICK oper\r\nUSER oper 0 * :Operator\r\nJOIN #test\r\nTOPIC #test :study math only\r\n" | nc localhost 1337
+
+printf "PASS pass\r\nNICK user2\r\nUSER user2 0 * :Second User\r\nJOIN #test\r\nTOPIC #test\r\n" | nc localhost 1337
+
+
+###PRIVMSG
+printf "PASS pass\r\nNICK user2\r\nUSER user2 0 * :User Two\r\nPRIVMSG user1 :Hello user1!\r\n" | nc localhost 1337 
+
+printf "PASS pass\r\nNICK chatter\r\nUSER chatter 0 * :Channel Talker\r\nJOIN #test\r\nPRIVMSG #test :Hello everyone!\r\n" | nc localhost 1337
+
+####Operator
+
+#INVITE
+printf "PASS pass\r\nNICK oper2\r\nUSER oper2 0 * :Operator Two\r\nJOIN #test\r\nINVITE user2 #test\r\n" | nc localhost 1337
+
+#KICK
+printf "PASS pass\r\nNICK oper3\r\nUSER oper3 0 * :Operator Three\r\nJOIN #test\r\nKICK #test chatter :Bye\r\n" | nc localhost 1337
+
+#MODE
+printf "PASS pass\r\nNICK oper4\r\nUSER oper4 0 * :Operator Four\r\nJOIN #test\r\nMODE #test +i\r\nMODE #test +t\r\n" | nc localhost 1337
+
+#PART + quit
+printf "PASS pass\r\nNICK quitter\r\nUSER quitter 0 * :Leaving\r\nJOIN #test\r\nPART #test :I am leaving\r\nQUIT :Goodbye\r\n" | nc localhost 1337
+
+#quit
+printf "PASS pass\r\nNICK quitter\r\nUSER quitter 0 * :Quit User\r\nQUIT :Goodbye\r\n" | nc localhost 1337

@@ -3,6 +3,11 @@
 #include "../../inc/Client.hpp"
 #include "../../inc/Replies.hpp"
 
+/*
+ * Parameters: <receiver>{,<receiver>} <text to be sent>
+ * Link: https://datatracker.ietf.org/doc/html/rfc1459#section-4.4.1
+ */
+
 std::vector<std::string> split_parameters(const std::string& s, const std::string& delimiter) {
 	std::vector<std::string> tokens;
 	size_t pos = 0, next;
