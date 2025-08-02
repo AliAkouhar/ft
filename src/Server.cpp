@@ -193,12 +193,12 @@ std::vector<std::string> _split_commd(const std::string& buffer,
 }
 
 std::vector<std::string> Server::_split_buffer(const std::string& buffer,
-											   const std::string& delimiter)
+                                               const std::string& delimiter)
 {
-	std::string command;
-	std::string parameters;
-	std::vector<std::string> tokens;
-	std::istringstream iss(buffer);
+    std::string command;
+    std::string parameters;
+    std::vector<std::string> tokens;
+    std::istringstream iss(buffer);
 
 	iss >> command;
 	tokens.push_back(command);

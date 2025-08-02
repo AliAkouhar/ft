@@ -220,7 +220,7 @@ int Server::_kick_checks(Client* kicker, Channel* channel, const int fd, const s
 	return 0;
 }
 
-int Server::_topic_checks(Client* client, const int fd, const std::string& channel_name, std::vector<std::string>& params) {
+int Server::_topic_checks(Client* client, const int fd, std::string channel_name, std::vector<std::string>& params) {
 	if (params.size() < 1) {
 		_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
 		_reply_code = 461;
@@ -232,7 +232,6 @@ int Server::_topic_checks(Client* client, const int fd, const std::string& chann
 		_reply_code = 451;
 		return 1;
 	}
-
 	Channel* channel = _get_channel(channel_name);
 
 	if (!channel) {

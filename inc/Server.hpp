@@ -100,7 +100,7 @@ class Server
 	int _nickname_checks(const std::string& nickname, Client* client, const int fd);
 	int _join_checks(Client *client, const int fd, const std::vector<std::string>& params);
 	int _kick_checks(Client* kicker, Channel* channel, const int fd, const std::string& channel_name, std::vector<std::string> params);
-	int _topic_checks(Client* client, const int fd, const std::string& channel_name, std::vector<std::string>& params);
+	int _topic_checks(Client* client, const int fd, std::string channel_name, std::vector<std::string>& params);
 	int _mode_checks(Client* client, const int fd, const std::string& channel_name,
 						const std::string& modeFlags);
 	int _privmsg_checks(Client* client, const int fd, std::vector<std::string> receivers);					
