@@ -6,6 +6,7 @@ OBJ_DIR = obj
 
 SRC = src/main.cpp \
       src/Server.cpp \
+      src/serverUtils.cpp \
       src/Client.cpp \
       src/Channel.cpp \
       src/commd/Join.cpp \

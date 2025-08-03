@@ -36,7 +36,6 @@ void Server::_ft_kick(const std::string& buffer, const int fd) {
 			reason
 	);
 
-	channel->broadcast(kicker, channel_name, kick_msg);
 	_send_response(target->get_fd(), kick_msg);
 
 	channel->kick(target);
