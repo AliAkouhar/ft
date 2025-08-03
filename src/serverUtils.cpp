@@ -218,6 +218,7 @@ void Server::_exec_cmd(const std::string buffer, const int fd)
 	if (buffer.empty()) 
 		return;
 
+	std::string parameters;
 	std::string clean_buffer = _remove_rn(buffer, CRLF);
 	std::vector<std::string> splitted_buffer =
 		_split_commd(buffer, SPACE);
@@ -227,8 +228,9 @@ void Server::_exec_cmd(const std::string buffer, const int fd)
 
 	std::string command = toupper(splitted_buffer[0]);
     if (splitted_buffer[1].empty())
-        return ;
-    std::string parameters = splitted_buffer[1];
+        parameters = "";
+	else if (splitted_buffer.size() > 1)
+    	parameters = splitted_buffer[1];
 
 	_handle_commands(command, parameters, fd);
 }
