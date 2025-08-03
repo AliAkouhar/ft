@@ -47,6 +47,9 @@ class Server
 
 	void createSocket();
     void setSocketReused();
+	void setSocketNonBlocking();
+    void shutdown();
+	int _get_port(std::string port);
     void bindSocket();
     void listenSocket();
     void closeSocket(int socketFd);
