@@ -24,8 +24,10 @@ void Server::_ft_topic(const std::string& buffer, const int fd) {
         std::string topic = channel->get_topic();
         if (topic.empty()) {
             _send_response(fd, RPL_NOTOPIC(client->get_nickname(), channel_name));
+            _reply_code = 331;
         } else {
             _send_response(fd, RPL_TOPIC(client->get_nickname(), channel_name, topic));
+            _reply_code = 332;
         }
         return;
     }
@@ -33,14 +35,16 @@ void Server::_ft_topic(const std::string& buffer, const int fd) {
     if (channel->get_topic_restriction() && 
         !channel->is_channel_operator(client->get_nickname())) {
         _send_response(fd, ERR_CHANOPRIVSNEEDED(channel_name));
+        _reply_code = 482;
         return;
     }
     size_t pos = buffer.find(channel_name);
     if (pos != std::string::npos) {
-        pos += channel_name.length();
+        pos += channel_name.length() + 1;
         std::string new_topic = buffer.substr(pos);
         
         channel->set_topic(new_topic);
         _send_response(fd, RPL_TOPIC(client->get_nickname(), channel_name, new_topic));
+        _reply_code = 332;
     }
 }

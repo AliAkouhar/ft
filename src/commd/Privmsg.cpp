@@ -10,6 +10,7 @@
 
 std::vector<std::string> split_parameters(const std::string& s, const std::string& delimiter) {
 	std::vector<std::string> tokens;
+	
 	size_t pos = 0, next;
 	while ((next = s.find(delimiter, pos)) != std::string::npos) {
 		tokens.push_back(s.substr(pos, next - pos));
