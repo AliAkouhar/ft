@@ -88,7 +88,7 @@ int Server::_nickname_checks(const std::string& buffer, Client* client, const in
     return 0;
 }
 
-void Server::_part_cont(std::string& channel_name, Client* client, const int fd)
+int Server::_part_cont(std::string& channel_name, Client* client, const int fd)
 {
     Channel* channel = _get_channel(channel_name);
 
@@ -96,14 +96,14 @@ void Server::_part_cont(std::string& channel_name, Client* client, const int fd)
     {
         _send_response(fd, ERR_NOSUCHCHANNEL(channel_name));
         _reply_code = 403;
-        return ;
+        return 1;
     }
 
     if (!channel->has_client(client))
     {
         _send_response(fd, ERR_NOTONCHANNEL(channel_name));
         _reply_code = 442;
-        return ;
+        return 1;
     }
 
     channel->part(client);
@@ -154,6 +154,7 @@ int Server::_invite_checks(Client* client,  Client* invitee, const int fd, std::
 	{
 		_send_response(fd, ERR_NOSUCHCHANNEL(target_channel));
 		_reply_code = 403;
+		return 1;
 	}
 	if (!channel->has_client(client))
 	{

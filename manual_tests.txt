@@ -72,3 +72,14 @@ printf "PASS pass\r\nNICK quitter\r\nUSER quitter 0 * :Leaving\r\nJOIN #test\r\n
 
 #quit
 printf "PASS pass\r\nNICK quitter\r\nUSER quitter 0 * :Quit User\r\nQUIT :Goodbye\r\n" | nc localhost 1337
+
+
+
+#hexchat
+
+hexchat --dir /tmp/hex2
+
+/quote PASS pass
+/quote NICK user1
+/quote USER user1 0 * :First User
+

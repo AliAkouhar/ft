@@ -29,5 +29,6 @@ void Server::_ft_part(const std::string& buffer, const int fd) {
         return ;
     }
 	
-    _part_cont(channel_name, client, fd);
+    if (!_part_cont(channel_name, client, fd))
+        return ;
 }

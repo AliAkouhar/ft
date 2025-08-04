@@ -2,15 +2,9 @@
 #define REPLIES_HPP
 #define CRLF "\r\n"
 
-// refer to https://datatracker.ietf.org/doc/html/rfc1459
-
-/*
-** ----------------------------- REPLY MESSAGES -------------------------------
-*/
-
 #define RPL_CONNECTED(serverhostname, nickname, targethostname) \
 	(":" + serverhostname + " 001 " + nickname +                \
-	 " :Welcome to the IRC server! " + nickname + "!" + targethostname + CRLF)
+	 " :Welcome to the 1337 IRC server! " + nickname + "!" + targethostname + CRLF)
 
 #define RPL_UMODEIS(nickname, hostname, channelname, set, mode, arg)        \
 	(":" + nickname + "!" + hostname + " MODE " + channelname + " " + set + \
@@ -62,9 +56,6 @@
 	(":" + nickname + "!" + hostname + " PRIVMSG " + receiver + " " + text + \
 	 CRLF)
 
-/*
-** --------------------------- ERROR REPLY MESSAGES ---------------------------
-*/
 #define ERR_NEEDMODEPARM(channelname, mode) \
 	(":696 " + channelname +                \
 	 " * You must specify a parameter for the key mode. " + mode + CRLF)

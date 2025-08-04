@@ -1,5 +1,17 @@
 #include "../inc/Server.hpp"
 
+std::vector<std::string> split_parameters(const std::string& s, const std::string& delimiter) {
+	std::vector<std::string> tokens;
+	
+	size_t pos = 0, next;
+	while ((next = s.find(delimiter, pos)) != std::string::npos) {
+		tokens.push_back(s.substr(pos, next - pos));
+		pos = next + delimiter.length();
+	}
+	tokens.push_back(s.substr(pos));
+	return tokens;
+}
+
 void Server::_remove_client_from_server(const int fd)
 {
 	for (std::vector<Client*>::iterator it = _clients.begin();
@@ -236,4 +248,3 @@ void Server::_exec_cmd(const std::string buffer, const int fd)
 }
 
 void Server::_add_channel(Channel* channel) { _channels.push_back(channel); }
-

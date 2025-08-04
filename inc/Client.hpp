@@ -1,6 +1,5 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
-
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <netinet/in.h>
@@ -14,9 +13,6 @@
 #include <string>
 #include <vector>
 #include "Replies.hpp"
-
-//-------------------------------------------------------//
-
 #define RED "\e[1;31m"
 #define WHI "\e[0;37m"
 #define GRE "\e[1;32m"

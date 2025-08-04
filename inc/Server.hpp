@@ -19,16 +19,10 @@
 #include <utility>
 #include <vector>
 #include <sys/epoll.h>
-
-//-------------------------------------------------------//
-
 #define RED "\e[1;31m"
 #define WHI "\e[0;37m"
 #define GRE "\e[1;32m"
 #define YEL "\e[1;33m"
-
-//-------------------------------------------------------//
-
 #include "../inc/Channel.hpp"
 #include "../inc/Client.hpp"
 #include "../inc/Replies.hpp"
@@ -74,10 +68,6 @@ class Server
 	int _reply_code;
 
 	std::string _get_hostname();
-
-	// void _is_valid_port(const std::string& port);
-	// bool _is_client_in_any_channel(const int fd);
-
 	void _handle_commands(const std::string& command, const std::string& parameters, const int fd);
 	bool _is_nickname_in_use(const int fd, const std::string& nickname);
 	bool _is_valid_nickname(const std::string& nickname);
@@ -99,7 +89,7 @@ class Server
 	void _exec_cmd(const std::string buffer, const int fd);
 
 	int _user_checks(Client *client, const int fd);
-	void _part_cont(std::string& channel_name, Client* client, const int fd);
+	int _part_cont(std::string& channel_name, Client* client, const int fd);
 	int _nickname_checks(const std::string& nickname, Client* client, const int fd);
 	int _join_checks(Client *client, const int fd, const std::vector<std::string>& params);
 	int _kick_checks(Client* kicker, Channel* channel, const int fd, const std::string& channel_name, std::vector<std::string> params);
@@ -137,6 +127,7 @@ void _set_channel_key_mode(Channel* channel, const std::string& key,
 void _set_channel_operator_mode(Channel* channel, Client* client, bool addMode);
 void _set_channel_limit_mode(Channel* channel, const std::string& limitStr,
 							 bool addMode);
+std::vector<std::string> split_parameters(const std::string& s, const std::string& delimiter);
 							
 std::string toupper(const std::string& str);
 
