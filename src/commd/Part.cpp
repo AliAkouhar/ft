@@ -3,12 +3,10 @@
 #include "../../inc/Client.hpp"
 #include "../../inc/Replies.hpp"
 
-
 /*
  * Parameters: <channel>{,<channel>}
  * Link: https://datatracker.ietf.org/doc/html/rfc1459#section-4.2.2
  */
-
 
 void Server::_ft_part(const std::string& buffer, const int fd) {
     std::vector<std::string> param = _split_buffer(buffer, SPACE);

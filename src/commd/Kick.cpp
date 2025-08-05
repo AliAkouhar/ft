@@ -27,6 +27,7 @@ void Server::_ft_kick(const std::string& buffer, const int fd) {
 		_reply_code = 441;
 		return;
 	}
+	
 	std::string reason = (comments.size() > 1) ? comments[1] : std::string("");
 	std::string kick_msg = RPL_KICK(
 			kicker->get_hostname(),

@@ -53,19 +53,20 @@ class Server
     void readSocket();
     void handleClientData(int clientFd);
     void setup();
+
   private:
 	int _port;
-	int _server_fdsocket;
 	int epollFd;
-	std::string _hostname;
-	std::string _pass;
 	std::string _ip;
+	int _server_fdsocket;
+	std::string _hostname;
 	std::vector<struct epoll_event> _fds;
 	struct sockaddr_in _server_addr;
-	std::vector<Client*> _clients;
 	std::vector<Channel*> _channels;
-
+	std::vector<Client*> _clients;
+	std::string _pass;
 	int _reply_code;
+
 
 	std::string _get_hostname();
 	void _handle_commands(const std::string& command, const std::string& parameters, const int fd);
@@ -99,7 +100,6 @@ class Server
 	int _privmsg_checks(Client* client, const int fd, std::vector<std::string> receivers);					
 	int _invite_checks(Client* client, Client* invitee ,const int fd, std::vector<std::string>& params);
 
-				
 	std::string _remove_rn(const std::string& buffer,
 								const std::string& chars_to_remove);
 	std::vector<std::string> _split_buffer(const std::string& buffer,
@@ -127,8 +127,7 @@ void _set_channel_key_mode(Channel* channel, const std::string& key,
 void _set_channel_operator_mode(Channel* channel, Client* client, bool addMode);
 void _set_channel_limit_mode(Channel* channel, const std::string& limitStr,
 							 bool addMode);
-std::vector<std::string> split_parameters(const std::string& s, const std::string& delimiter);
-							
+std::vector<std::string> split_parameters(const std::string& s, const std::string& delimiter);	
 std::string toupper(const std::string& str);
 
 #endif

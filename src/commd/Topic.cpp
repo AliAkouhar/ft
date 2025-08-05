@@ -11,21 +11,24 @@
 void Server::_ft_topic(const std::string& buffer, const int fd) {
     std::vector<std::string> params = _split_buffer(buffer, SPACE);
     if (params.empty()) return;
+    Client* client = _get_client(fd);
 
     std::string channel_name = params[0];
-    Client* client = _get_client(fd);
     Channel* channel = _get_channel(channel_name);
-
     if (_topic_checks(client, fd, channel_name, params)) {
         return;
     }
 
-    if (params[1].empty()) {
+    if (params[1].empty())
+    {
         std::string topic = channel->get_topic();
-        if (topic.empty()) {
+        if (topic.empty())
+        {
             _send_response(fd, RPL_NOTOPIC(client->get_nickname(), channel_name));
             _reply_code = 331;
-        } else {
+        }
+        else
+        {
             _send_response(fd, RPL_TOPIC(client->get_nickname(), channel_name, topic));
             _reply_code = 332;
         }
@@ -33,13 +36,16 @@ void Server::_ft_topic(const std::string& buffer, const int fd) {
     }
 
     if (channel->get_topic_restriction() &&
-        !channel->is_channel_operator(client->get_nickname())) {
+        !channel->is_channel_operator(client->get_nickname()))
+    {
         _send_response(fd, ERR_CHANOPRIVSNEEDED(channel_name));
         _reply_code = 482;
         return;
     }
+
     size_t pos = buffer.find(channel_name);
-    if (pos != std::string::npos) {
+    if (pos != std::string::npos)
+    {
         pos += channel_name.length() + 1;
         std::string new_topic = buffer.substr(pos);
         

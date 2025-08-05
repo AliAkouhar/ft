@@ -43,7 +43,8 @@ int Server::_join_checks(Client *client, const int fd, const std::vector<std::st
 	}
 
 	Channel* channel = _get_channel(channel_name);
-	if (!channel) {
+	if (!channel)
+	{
 		channel = new Channel(channel_name);
 		_add_channel(channel);
 		channel->join(client);
@@ -58,6 +59,7 @@ int Server::_join_checks(Client *client, const int fd, const std::vector<std::st
 		_reply_code = 462;
 		return 1;
 	}
+
 	if (channel->is_channel_full())
 	{
 		_send_response(
@@ -158,6 +160,7 @@ int Server::_user_checks(Client* client, const int fd)
 		_reply_code = 462;
 		return 1;
 	}
+	
 	return 0;
 }
 
@@ -247,6 +250,7 @@ int Server::_kick_checks(Client* kicker, Channel* channel, const int fd, const s
 		_reply_code = 482;
 		return 1;
 	}
+	
 	return 0;
 }
 

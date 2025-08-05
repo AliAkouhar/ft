@@ -25,7 +25,7 @@ void Server::_ft_username(const std::string& buffer, const int fd)
 										client->get_nickname(),
 										client->get_hostname()));
 		_reply_code = 001;
+		return ;
 	}
-	else
-		_reply_code = 200;
+	_reply_code = 200;
 }

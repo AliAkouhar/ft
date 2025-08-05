@@ -14,8 +14,7 @@ void Server::_ft_mode(const std::string& buffer, const int fd) {
 	std::istringstream iss(buffer);
 
 	iss >> channelName >> modeFlags;
-	if (iss >> argument)
-		iss >> argument;
+	std::getline(iss >> std::ws, argument);
 
 	Client* client = _get_client(fd);
 	if (_mode_checks(client, fd, channelName, modeFlags))
