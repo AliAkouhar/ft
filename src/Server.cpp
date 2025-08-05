@@ -230,6 +230,7 @@ void Server::handleClientData(int clientFd)
         {
             if (_clients[i]->get_fd() == clientFd)
             {
+                std::cout << "Client disconnected: fd QQQQQQQQQQQQQQqQq " << clientFd << std::endl;
                 // Remove from epoll
                 epoll_ctl(epollFd, EPOLL_CTL_DEL, clientFd, NULL);
                 // Close socket

@@ -52,9 +52,13 @@
 #define RPL_INVITING(hostname, channelname, invitername, invitedname) \
 	(":" + hostname + " INVITE " + invitedname + " " + channelname + CRLF)
 
-#define RPL_PRIVMSG(nickname, hostname, receiver, text)                      \
+/*#define RPL_PRIVMSG(nickname, hostname, receiver, text)                      \
 	(":" + nickname + "!" + hostname + " PRIVMSG " + receiver + " " + text + \
-	 CRLF)
+	 CRLF)*/
+
+#define RPL_PRIVMSG(nickname, hostname, receiver, text) \
+    (":" + nickname + "!" + hostname + " PRIVMSG " + receiver + " :" + text + CRLF)
+
 
 #define ERR_NEEDMODEPARM(channelname, mode) \
 	(":696 " + channelname +                \

@@ -221,7 +221,9 @@ void Server::_handle_commands(const std::string& command, const std::string& par
         _ft_invite(parameters, fd);
     else if (command == "PRIVMSG")
         _ft_privmsg(parameters, fd);
-    else
+    else if (command == "CAP")
+		return ;
+	else
         _send_response(fd, ERR_CMDNOTFOUND(command));
 }
 
