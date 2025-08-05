@@ -250,3 +250,5 @@ void Server::_exec_cmd(const std::string buffer, const int fd)
 }
 
 void Server::_add_channel(Channel* channel) { _channels.push_back(channel); }
+
+//#######################

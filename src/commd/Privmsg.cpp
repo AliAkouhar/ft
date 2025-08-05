@@ -40,7 +40,6 @@ void Server::_ft_privmsg(const std::string& buffer, const int fd) {
 				client->get_hostname(),
 				target_client->get_nickname(),
 				message));
-			// std
 		}
 	}
 	_reply_code = 200;
