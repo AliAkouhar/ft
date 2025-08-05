@@ -5,44 +5,38 @@
 
 
 /*
- * Parameters: <channel>{,<channel>} [<key>{,<key>}]
+ * Parameters: <channel> [<key>]
  * Link: https://datatracker.ietf.org/doc/html/rfc1459#section-4.2.1
  */
 
 void Server::_ft_join(const std::string& buffer, const int fd) {
 	std::vector<std::string> params = _split_buffer(buffer, SPACE);
 	std::string channel_name = params[0];
-	Client* client = _get_client(fd);
 
+	Client* client = _get_client(fd);
+	if (buffer.empty())
+	{
+		_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
+		_reply_code = 461;
+		return;
+	}
+	
+	if (!client->get_is_logged())
+	{
+		_send_response(fd, ERR_NOTREGISTERED(client->get_nickname()));
+		_reply_code = 451;
+		return;
+	}
+	
 	if (_join_checks(client, fd, params)) {
 		return ;	
 	}
 
 	Channel* channel = _get_channel(channel_name);
-
-	if (!channel) {
-		channel = new Channel(channel_name);
-		_add_channel(channel);
-		channel->join(client);
-		channel->set_channel_operator(client);
-	}
-	else 
-	{
-		if (channel->has_client(client)) {
-			_send_response(fd, ERR_ALREADYREGISTERED(client->get_nickname()));
-			_reply_code = 462;
-			return;
-		}
-
-		if (channel->is_channel_invite_only() &&
-			!client->is_channel_invited(channel_name)) {
-			_send_response(fd, ERR_INVITEONLYCHAN(client->get_nickname(), channel_name));
-			_reply_code = 473;
-			return;
-		}
-		channel->join(client);
-	}
-    
-	_send_response(fd, RPL_JOINMSG(client->get_nickname(), client->get_hostname(), channel_name));
+	channel->join(client);
+	_send_response(fd,
+				RPL_JOINMSG(client->get_nickname(),
+							client->get_hostname(),
+							channel_name));
 	_reply_code = 200;
 }

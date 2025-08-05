@@ -32,7 +32,7 @@ void Server::_ft_topic(const std::string& buffer, const int fd) {
         return;
     }
 
-    if (channel->get_topic_restriction() && 
+    if (channel->get_topic_restriction() &&
         !channel->is_channel_operator(client->get_nickname())) {
         _send_response(fd, ERR_CHANOPRIVSNEEDED(channel_name));
         _reply_code = 482;
