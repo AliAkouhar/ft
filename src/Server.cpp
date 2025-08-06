@@ -57,7 +57,8 @@ Server::~Server()
     // Clean up all client objects
     for (size_t i = 0; i < _clients.size(); ++i)
     {
-        delete _clients[i];
+        if (_clients[i] != NULL)
+            delete _clients[i];
     }
     _clients.clear();
 
@@ -230,13 +231,14 @@ void Server::handleClientData(int clientFd)
         {
             if (_clients[i]->get_fd() == clientFd)
             {
-                std::cout << "Client disconnected: fd AAAAAAAAAAAAAAA " << clientFd << std::endl;
                 // Remove from epoll
                 epoll_ctl(epollFd, EPOLL_CTL_DEL, clientFd, NULL);
                 // Close socket
                 closeSocket(clientFd);
                 // Delete client object and remove from vector
                 delete _clients[i];
+                // _clients[i] = NULL;
+                std::cout << "Client disconnected: fd AAAAAAAAAAAAAAA " << clientFd << std::endl;
                 _clients.erase(_clients.begin() + i);
                 std::cout << "Client disconnected: fd " << clientFd << std::endl;
                 break;
@@ -308,11 +310,14 @@ void Server::shutdown()
     // Close all client connections
     for (size_t i = 0; i < _clients.size(); ++i)
     {
-        int client_fd = _clients[i]->get_fd();
-        epoll_ctl(epollFd, EPOLL_CTL_DEL, client_fd, NULL);
-        close(client_fd);
-        std::cout << "Closed client connection: fd " << client_fd << std::endl;
-        delete _clients[i];
+        if (_clients[i] != NULL)
+        {
+            int client_fd = _clients[i]->get_fd();
+            epoll_ctl(epollFd, EPOLL_CTL_DEL, client_fd, NULL);
+            close(client_fd);
+            std::cout << "Closed client connection: fd " << client_fd << std::endl;
+            delete _clients[i];
+        }
     }
     _clients.clear();
     

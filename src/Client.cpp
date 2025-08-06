@@ -28,7 +28,13 @@ Client::Client(const Client& other)
 	_channels_invited = other._channels_invited;
 }
 
-Client::~Client() {}
+Client::~Client() {
+	if (_fd != -1) {
+		close(_fd);
+		_fd = -1;
+	}
+	// Removed dangerous 'delete this;' - destructors should not delete themselves
+}
 
 void Client::set_fd(const int fd) { _fd = fd; }
 

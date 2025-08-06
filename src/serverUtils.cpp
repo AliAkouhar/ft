@@ -203,8 +203,8 @@ void Server::_handle_commands(const std::string& command, const std::string& par
         _ft_part(parameters, fd);
     else if (command == "JOIN")
         _ft_join(parameters, fd);
-    else if (command == "QUIT")
-        _ft_quit(parameters, fd);
+    // else if (command == "QUIT")
+    //     _ft_quit(parameters, fd);
     else if (command == "MODE")
         _ft_mode(parameters, fd);
     else if (command == "KICK")
