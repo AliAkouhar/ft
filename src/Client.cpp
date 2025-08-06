@@ -33,7 +33,7 @@ Client::~Client() {
 		close(_fd);
 		_fd = -1;
 	}
-	delete this; // Ensure proper cleanup
+	// Removed dangerous 'delete this;' - destructors should not delete themselves
 }
 
 void Client::set_fd(const int fd) { _fd = fd; }
