@@ -28,7 +28,13 @@ Client::Client(const Client& other)
 	_channels_invited = other._channels_invited;
 }
 
-Client::~Client() {}
+Client::~Client() {
+	if (_fd != -1) {
+		close(_fd);
+		_fd = -1;
+	}
+	delete this; // Ensure proper cleanup
+}
 
 void Client::set_fd(const int fd) { _fd = fd; }
 
@@ -101,7 +107,7 @@ void Client::remove_channel_invited(const std::string& channel)
 void Client::broadcast(Client* sender, std::string target, std::string message)
 {
 	std::string response = RPL_PRIVMSG(
-		sender->get_nickname(), sender->get_hostname(), target, message);
+		sender->get_nickname(), sender->get_username() ,sender->get_hostname(), target, message);
 
 	if (send(this->get_fd(), response.c_str(), response.size(), 0) == -1)
 		std::cerr << "Response sending failed" << std::endl;
