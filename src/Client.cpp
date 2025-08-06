@@ -28,13 +28,7 @@ Client::Client(const Client& other)
 	_channels_invited = other._channels_invited;
 }
 
-Client::~Client() {
-	if (_fd != -1) {
-		close(_fd);
-		_fd = -1;
-	}
-	delete this; // Ensure proper cleanup
-}
+Client::~Client() {}
 
 void Client::set_fd(const int fd) { _fd = fd; }
 
@@ -72,7 +66,10 @@ std::string Client::get_username() const { return _username; }
 
 std::string Client::get_password() const { return _password; }
 
-std::string Client::get_hostname() const { return _username + "@" + _ip_addr; }
+std::string Client::get_hostname() const { 
+	std::cout << "Hostname returns [" << _username << "]"<< std::endl;
+	std::cout << "IP Address returns [" << _ip_addr << "]"<<std::endl;
+	return _username + "@" + _ip_addr; }
 
 std::vector<std::string> Client::get_channels_invited() const {	return _channels_invited; }
 
@@ -107,7 +104,7 @@ void Client::remove_channel_invited(const std::string& channel)
 void Client::broadcast(Client* sender, std::string target, std::string message)
 {
 	std::string response = RPL_PRIVMSG(
-		sender->get_nickname(), sender->get_username() ,sender->get_hostname(), target, message);
+		sender->get_nickname(), sender->get_hostname(), target, message);
 
 	if (send(this->get_fd(), response.c_str(), response.size(), 0) == -1)
 		std::cerr << "Response sending failed" << std::endl;

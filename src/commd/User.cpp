@@ -15,8 +15,12 @@ void Server::_ft_username(const std::string& buffer, const int fd)
 	}
 	else if (_user_checks(client, fd))
 		return;
-	
-	client->set_username(buffer);
+
+	std::istringstream iss(buffer);
+    std::string username;
+    iss >> username;
+
+	client->set_username(username);
 	if (_client_is_ready_to_login(fd))
 	{
 		client->set_is_logged(fd); 	

@@ -8,81 +8,53 @@
  * Link: https://datatracker.ietf.org/doc/html/rfc1459#section-4.4.1
  */
 
-// void Server::_ft_privmsg(const std::string& buffer, const int fd) {
-// 	std::vector<std::string> params = _split_buffer(buffer, " ");
-// 	Client* client = _get_client(fd);
-	
-// 	if (params.size() < 2) {
-// 		_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
-// 		_reply_code = 461;
-// 		return ;
-// 	}
-
-// 	std::vector<std::string> receivers = split_parameters(params[0], ",");
-// 	if (_privmsg_checks(client, fd, receivers))
-// 	{
-// 		return ;
-// 	}
-	
-// 	const std::string& message = params[1];
-// 	for (std::vector<std::string>::iterator it = receivers.begin(); it != receivers.end(); ++it) {
-// 		const std::string& target = *it;
-
-// 		if (target[0] == '#') {
-// 			Channel* channel = _get_channel(target);
-// 			channel->broadcast(client, channel->get_name(), message);
-// 		}
-// 		else
-// 		{
-// 			Client* target_client = _get_client(target);
-// 			_send_response(target_client->get_fd(), RPL_PRIVMSG(
-// 				client->get_nickname(),
-// 				client->get_username(),
-// 				client->get_hostname(),
-// 				target_client->get_nickname(),
-// 				message));
-// 		}
-// 	}
-// 	_reply_code = 200;
-// }
-
 void Server::_ft_privmsg(const std::string& buffer, const int fd) {
-    std::vector<std::string> params = _split_buffer(buffer, " ");
-    Client* client = _get_client(fd);
+	std::vector<std::string> params = _split_buffer(buffer, " ");
+	Client* client = _get_client(fd);
+	
+	if (params.size() < 2) {
+		_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
+		_reply_code = 461;
+		return ;
+	}
 
-    if (params.size() < 2) {
-        _send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
-        _reply_code = 461;
-        return;
-    }
+	std::vector<std::string> receivers = split_parameters(params[0], ",");
+	if (_privmsg_checks(client, fd, receivers))
+	{
+		return ;
+	}
 
-    std::vector<std::string> receivers = split_parameters(params[0], ",");
-    if (_privmsg_checks(client, fd, receivers))
-        return;
-
-    // Extract message including spaces and remove leading ':'
-    std::string message = buffer.substr(buffer.find(' ') + 1); 
-    message = message.substr(message.find(' ') + 1);
+	std::string message = params[1];
     if (!message.empty() && message[0] == ':')
+	{
         message.erase(0, 1);
+	}
+	for (std::vector<std::string>::iterator it = receivers.begin(); it != receivers.end(); ++it) {
+		const std::string& target = *it;
 
-    for (std::vector<std::string>::iterator it = receivers.begin(); it != receivers.end(); ++it) {
-        const std::string& target = *it;
+		if (target[0] == '#') {
+			Channel* channel = _get_channel(target);
+			channel->broadcast(client, channel->get_name(), message);
+		}
+		else
+		{
+			//  :user!user 0 * :realname@127.0.0.1 PRIVMSG test :hello there
+			//:test!test@127.0.0.1 PRIVMSG user :hello im test
 
-        if (target[0] == '#') {
-            Channel* channel = _get_channel(target);
-            channel->broadcast(client, channel->get_name(), message);
-        } else {
-            Client* target_client = _get_client(target);
-            if (target_client)
-                _send_response(target_client->get_fd(), 
-                    RPL_PRIVMSG(client->get_nickname(),
-                                client->get_username(),
-                                client->get_hostname(),
-                                target_client->get_nickname(),
-                                message));
-        }
-    }
-
-    _reply_code = 200;
+			Client* target_client = _get_client(target);
+			// std::cout << "RPL MESSAGE " << RPL_PRIVMSG(
+            //     client->get_nickname(),
+			// 	client->get_hostname(),
+			// 	target_client->get_nickname(),
+			// 	message) << std::endl;
+			// std::cout << "Hostname returns " << client->get_hostname() << std::endl;
+			_send_response(target_client->get_fd(), RPL_PRIVMSG(
+                client->get_nickname(),
+				client->get_hostname(),
+				target_client->get_nickname(),
+				message));
+		}
+	}
+	_reply_code = 200;
 }
+

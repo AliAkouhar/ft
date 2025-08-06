@@ -260,7 +260,7 @@ void Server::handleClientData(int clientFd)
                     clientBuff.erase(0, pos + 2); // remove the c
                     // Process the complete message hereomplete message from the
                     _clients[i]->set_buffer(clientBuff);
-                    std::cout << "complete message received: " << completMessage << std::endl;
+                    // std::cout << "complete message received: " << completMessage << std::endl;
                     Server::_exec_cmd(completMessage, _clients[i]->get_fd());
                     // Process the complete message here
                     // continue; // or continue to process more messages
