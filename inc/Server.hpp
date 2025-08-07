@@ -116,9 +116,9 @@ class Server
 	void _remove_client_from_server(const int fd);
 };
 
-bool _process_mode_flags(const std::string& modeFlags, Channel* channel,
+bool _process_flags(const std::string& modeFlags, Channel* channel,
 						 Client* targetClient, const std::string& argument);
-bool _apply_mode_flag(Channel* channel, Client* targetClient, char mode,
+bool _apply_mode(Channel* channel, Client* targetClient, char mode,
 					  bool addMode, const std::string& argument);
 void _set_invite_only_mode(Channel* channel, bool addMode);
 void _set_topic_restriction_mode(Channel* channel, bool addMode);

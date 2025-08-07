@@ -38,16 +38,7 @@ void Server::_ft_privmsg(const std::string& buffer, const int fd) {
 		}
 		else
 		{
-			//  :user!user 0 * :realname@127.0.0.1 PRIVMSG test :hello there
-			//:test!test@127.0.0.1 PRIVMSG user :hello im test
-
 			Client* target_client = _get_client(target);
-			// std::cout << "RPL MESSAGE " << RPL_PRIVMSG(
-            //     client->get_nickname(),
-			// 	client->get_hostname(),
-			// 	target_client->get_nickname(),
-			// 	message) << std::endl;
-			// std::cout << "Hostname returns " << client->get_hostname() << std::endl;
 			_send_response(target_client->get_fd(), RPL_PRIVMSG(
                 client->get_nickname(),
 				client->get_hostname(),

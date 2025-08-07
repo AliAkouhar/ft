@@ -1,6 +1,6 @@
 #include "../../inc/Server.hpp"
 
-bool _process_mode_flags(const std::string& modeFlags, Channel* channel,
+bool _process_flags(const std::string& modeFlags, Channel* channel,
 						 Client* targetClient, const std::string& argument)
 {
 	bool addMode = false;
@@ -16,7 +16,7 @@ bool _process_mode_flags(const std::string& modeFlags, Channel* channel,
 		else
 		{
 			mode = flag;
-			if (!_apply_mode_flag(
+			if (!_apply_mode(
 					channel, targetClient, mode, addMode, argument))
 				return false;
 		}
@@ -24,29 +24,21 @@ bool _process_mode_flags(const std::string& modeFlags, Channel* channel,
 	return true;
 }
 
-bool _apply_mode_flag(Channel* channel, Client* targetClient, char mode,
+bool _apply_mode(Channel* channel, Client* targetClient, char mode,
 					  bool addMode, const std::string& argument)
 {
-	switch (mode)
-	{
-	case 'i':
+	if (mode == 'i')
 		_set_invite_only_mode(channel, addMode);
-		break;
-	case 't':
+	else if (mode == 't')
 		_set_topic_restriction_mode(channel, addMode);
-		break;
-	case 'k':
+	else if (mode == 'k')
 		_set_channel_key_mode(channel, argument, addMode);
-		break;
-	case 'o':
+	else if (mode == 'o')
 		_set_channel_operator_mode(channel, targetClient, addMode);
-		break;
-	case 'l':
+	else if (mode == 'l')
 		_set_channel_limit_mode(channel, argument, addMode);
-		break;
-	default:
+	else
 		return false;
-	}
 	return true;
 }
 

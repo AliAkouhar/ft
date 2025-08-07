@@ -203,8 +203,6 @@ void Server::_handle_commands(const std::string& command, const std::string& par
         _ft_part(parameters, fd);
     else if (command == "JOIN")
         _ft_join(parameters, fd);
-    // else if (command == "QUIT")
-    //     _ft_quit(parameters, fd);
     else if (command == "MODE")
         _ft_mode(parameters, fd);
     else if (command == "KICK")
@@ -221,7 +219,8 @@ void Server::_handle_commands(const std::string& command, const std::string& par
         _ft_invite(parameters, fd);
     else if (command == "PRIVMSG")
         _ft_privmsg(parameters, fd);
-    else if (command == "CAP")
+    else if (command == "CAP" || command == "PING"
+			|| command == "PONG" || command == "WHO" || command == "QUIT")
 		return ;
 	else
         _send_response(fd, ERR_CMDNOTFOUND(command));
@@ -251,4 +250,3 @@ void Server::_exec_cmd(const std::string buffer, const int fd)
 
 void Server::_add_channel(Channel* channel) { _channels.push_back(channel); }
 
-//#######################

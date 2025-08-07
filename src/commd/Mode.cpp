@@ -21,7 +21,7 @@ void Server::_ft_mode(const std::string& buffer, const int fd) {
 		return ;
 	
 	Channel* channel = _get_channel(channelName);
-	if (!_process_mode_flags(
+	if (!_process_flags(
 				 modeFlags, channel, _get_client(argument), argument))
 	{
 		_send_response(

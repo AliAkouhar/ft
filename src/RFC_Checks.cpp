@@ -3,12 +3,6 @@
 int Server::_mode_checks(Client* client, const int fd, const std::string& channelName,
 						const std::string& modeFlags)
 {
-	if (modeFlags.empty())
-	{
-		_reply_code = 461;
-		return 1;
-	}
-
 	if (channelName.empty() || modeFlags.empty())
 	{
 		_send_response(fd, ERR_NEEDMOREPARAMS(client->get_nickname()));
@@ -171,6 +165,7 @@ int Server::_invite_checks(Client* client,  Client* invitee, const int fd, std::
 		_reply_code = 461;
 		return 1;
 	}
+
 	if (!client->get_is_logged()) {
 		_send_response(fd, ERR_NOTREGISTERED(client->get_nickname()));
 		_reply_code = 451;
@@ -181,7 +176,6 @@ int Server::_invite_checks(Client* client,  Client* invitee, const int fd, std::
 	std::string target_channel = params[1];
 
 	Channel* channel = _get_channel(target_channel);
-
 	if (!channel)
 	{
 		_send_response(fd, ERR_NOSUCHCHANNEL(target_channel));

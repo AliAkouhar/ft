@@ -29,5 +29,5 @@ void Server::_ft_invite(const std::string& buffer, const int fd) {
 										target_channel,
 										invitee->get_nickname(),
 										target_nick));
-			_reply_code = 200;
+	_reply_code = 200;
 }

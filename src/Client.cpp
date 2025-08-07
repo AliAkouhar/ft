@@ -33,7 +33,6 @@ Client::~Client() {
 		close(_fd);
 		_fd = -1;
 	}
-	// Removed dangerous 'delete this;' - destructors should not delete themselves
 }
 
 void Client::set_fd(const int fd) { _fd = fd; }
@@ -73,9 +72,8 @@ std::string Client::get_username() const { return _username; }
 std::string Client::get_password() const { return _password; }
 
 std::string Client::get_hostname() const { 
-	std::cout << "Hostname returns [" << _username << "]"<< std::endl;
-	std::cout << "IP Address returns [" << _ip_addr << "]"<<std::endl;
-	return _username + "@" + _ip_addr; }
+	return _username + "@" + _ip_addr;
+}
 
 std::vector<std::string> Client::get_channels_invited() const {	return _channels_invited; }
 
