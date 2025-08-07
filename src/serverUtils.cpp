@@ -56,7 +56,6 @@ void Server::_remove_client_fd(const int fd)
 void Server::_clear_client(const int fd)
 {
 	_remove_client_from_channels(fd);
-	/* _remove_client_from_server(fd); */
 	_remove_client_fd(fd);
 }
 

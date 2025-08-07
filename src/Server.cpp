@@ -6,12 +6,9 @@
 #define MAX_EVENTS 20
 #define MAX_BUFFER_SIZE 4096
 
-//new server
-
 Server* g_server = NULL;
 bool g_signal_received = false;
 
-// Signal handler function
 void signalHandler(int signal)
 {
     std::cout << "\nSignal " << signal << " received. Shutting down server..." << std::endl;
@@ -28,33 +25,11 @@ Server::Server()
     _hostname = "localhost";
     _pass = "default_password";
     _ip = "127.0.0.1";
-    g_server = this; // Set global pointer for signal handling
+    g_server = this;
 }
-
-
-
-// Server::~Server()
-// {
-// 	for (std::vector<Client*>::iterator it = _clients.begin();
-// 		 it != _clients.end();
-// 		 ++it)
-// 	{
-// 		delete *it;
-// 	}
-// 	_clients.clear();
-
-// 	for (std::vector<Channel*>::iterator it = _channels.begin();
-// 		 it != _channels.end();
-// 		 ++it)
-// 	{
-// 		delete *it;
-// 	}
-// 	_channels.clear();
-// }
 
 Server::~Server()
 {
-    // Clean up all client objects
     for (size_t i = 0; i < _clients.size(); ++i)
     {
         if (_clients[i] != NULL)
@@ -62,7 +37,6 @@ Server::~Server()
     }
     _clients.clear();
 
-    // Clean up all channel objects
     for (size_t i = 0; i < _channels.size(); ++i)
     {
         delete _channels[i];
@@ -83,7 +57,7 @@ Server::~Server()
         epollFd = -1;
         _hostname = "localhost";
         _ip = "127.0.0.1";
-        g_server = this; // Set global pointer for signal handling
+        g_server = this;
     }
     void Server::createSocket()
     {
@@ -124,13 +98,6 @@ int Server::_get_port(std::string port)
     return portNum;
 }
 
-// void Server::createSocket()
-// {
-//     _server_fdsocket = socket(AF_INET, SOCK_STREAM, 0);
-//     if (_server_fdsocket < 0)
-//         throw std::runtime_error("Failed to create socket\n");
-// }
-
 void Server::setSocketReused()
 {
     int opt = 1;
@@ -146,7 +113,6 @@ void Server::setSocketNonBlocking()
     if (fcntl(_server_fdsocket, F_SETFL, flags | O_NONBLOCK) == -1)
         throw std::runtime_error("Failed to set socket to non-blocking\n");
 }
-
 
 void Server::bindSocket()
 {
@@ -226,19 +192,13 @@ void Server::handleClientData(int clientFd)
     int readBytes = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
     if (readBytes <= 0)
     {
-        // Find and remove client
         for (size_t i = 0; i < _clients.size(); ++i)
         {
             if (_clients[i]->get_fd() == clientFd)
             {
-                // Remove from epoll
                 epoll_ctl(epollFd, EPOLL_CTL_DEL, clientFd, NULL);
-                // Close socket
                 closeSocket(clientFd);
-                // Delete client object and remove from vector
                 delete _clients[i];
-                // _clients[i] = NULL;
-                std::cout << "Client disconnected: fd AAAAAAAAAAAAAAA " << clientFd << std::endl;
                 _clients.erase(_clients.begin() + i);
                 std::cout << "Client disconnected: fd " << clientFd << std::endl;
                 break;
@@ -255,19 +215,14 @@ void Server::handleClientData(int clientFd)
                 std::string clientBuff = _clients[i]->get_buffer();
                 clientBuff += buffer;
                 _clients[i]->set_buffer(clientBuff);
-                size_t pos = 0; // i must understand it
+                size_t pos = 0;
                 while ((pos = clientBuff.find("\r\n")) != std::string::npos)
                 {
                     std::string completMessage = clientBuff.substr(0, pos);
-                    clientBuff.erase(0, pos + 2); // remove the c
-                    // Process the complete message hereomplete message from the
+                    clientBuff.erase(0, pos + 2);
                     _clients[i]->set_buffer(clientBuff);
-                    // std::cout << "complete message received: " << completMessage << std::endl;
                     Server::_exec_cmd(completMessage, _clients[i]->get_fd());
-                    // Process the complete message here
-                    // continue; // or continue to process more messages
                 }
-                // break;
             }
         }
     }
@@ -275,29 +230,22 @@ void Server::handleClientData(int clientFd)
 
 void Server::readSocket()
 {
-    // const int MAX_EVENTS = 64;
     struct epoll_event events[MAX_EVENTS];
     std::cout << "Server is running at port " << _port << " and waiting for connections..." << std::endl;
     
     while (!g_signal_received)
     {
-        int nfds = epoll_wait(epollFd, events, MAX_EVENTS, 1000); // 1 second timeout
+        int nfds = epoll_wait(epollFd, events, MAX_EVENTS, 1000);
         if (nfds < 0)
-        {
-            // epoll_wait failed, but continue if it's due to signal interruption
             continue;
-        }
         
         for (int i = 0; i < nfds; i++)
         {
             if (events[i].data.fd == _server_fdsocket)
-            {
                 acceptClient();
-            }
             else
-            {
                 handleClientData(events[i].data.fd);
-            }
+
         }
     }
     std::cout << "Server stopped gracefully." << std::endl;
@@ -307,7 +255,6 @@ void Server::shutdown()
 {
     std::cout << "Cleaning up server resources..." << std::endl;
     
-    // Close all client connections
     for (size_t i = 0; i < _clients.size(); ++i)
     {
         if (_clients[i] != NULL)
@@ -321,7 +268,6 @@ void Server::shutdown()
     }
     _clients.clear();
     
-    // Close server socket
     if (_server_fdsocket != -1)
     {
         close(_server_fdsocket);
@@ -329,7 +275,6 @@ void Server::shutdown()
         std::cout << "Server socket closed." << std::endl;
     }
     
-    // Close epoll
     if (epollFd != -1)
     {
         close(epollFd);
@@ -340,9 +285,8 @@ void Server::shutdown()
 
 void Server::setup()
 {
-    // Register signal handlers
-    signal(SIGINT, signalHandler);   // Ctrl+C
-    signal(SIGQUIT, signalHandler);  // Ctrl+backslash
+    signal(SIGINT, signalHandler);
+    signal(SIGQUIT, signalHandler);
     
     std::cout << "Signal handlers registered (SIGINT, SIGQUIT, SIGTERM)" << std::endl;
     
